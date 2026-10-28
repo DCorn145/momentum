@@ -48,6 +48,12 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--red);outline-of
 .vc{background:var(--sf);color:var(--tx);border:1px solid var(--ln);border-radius:18px;width:min(560px,100%);max-height:92vh;overflow:auto;padding:16px;position:relative}
 .vc h3{padding-right:50px}.vx{position:absolute;top:10px;right:10px;border:0;background:var(--sf2);color:var(--tx);width:40px;height:40px;border-radius:12px;font-size:18px;cursor:pointer}
 .vf{display:block;aspect-ratio:16/9;width:100%;border:0;border-radius:12px;background:#000}.vc video{display:block;width:100%;border-radius:12px;background:#000}.vc a.btn{display:inline-block;text-decoration:none}
+.sc{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.sc button{border:1px solid var(--ln);background:var(--sf2);color:var(--tx);border-radius:14px;padding:12px 2px;font-weight:700;cursor:pointer}
+.sc button span{display:block;font:22px 'Russo One',Impact,sans-serif}.sc button small{display:block;color:var(--mu);font-size:11px;text-transform:uppercase;letter-spacing:.4px;margin-top:3px}
+.sc button[aria-pressed=true]{background:var(--red);border-color:var(--red);color:#fff}.sc button[aria-pressed=true] small{color:#fff}
+.stepbar{height:5px;background:var(--sf2);border-radius:9px;overflow:hidden;margin:2px 0 12px}.stepbar i{display:block;height:100%;background:var(--red);transition:width .3s}
+.acts{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:20px}.btn.off{opacity:.4;pointer-events:none}
+.felt{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0}.felt span{background:var(--sf2);border-radius:999px;padding:5px 11px;font-size:13px;font-weight:600}.felt b{color:var(--red)}
 .exr{display:flex;gap:6px;align-items:center}.exr input{width:58px;padding:8px;border-radius:9px;border:1px solid var(--ln);background:var(--sf2);color:var(--tx)}
 .exr button{border:0;background:var(--sf2);color:var(--tx);width:38px;height:38px;border-radius:10px;font-size:18px;cursor:pointer}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.stat{background:var(--sf2);border-radius:14px;padding:12px 6px;text-align:center}.stat b{display:block;font:24px 'Russo One',Impact,sans-serif}.stat span{font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:1px}
@@ -255,19 +261,22 @@ function build(k,c,salt){
  if(!plan.length)plan.push({n:"90/90 Breathing",sets:1,l:null,m:false});
  return plan;
 }
-function initF(){const p=(S.days[today()]||{}).ck;F={sleep:6,energy:6,stress:5,red:false,...p,pain:[...(p?p.pain:[])],time:p?p.time:S.set.time,equip:[...(p?p.equip:S.set.equip)],level:(p&&p.level)||S.set.level||"beg"}}
+function initF(){const p=(S.days[today()]||{}).ck;F={sleep:null,energy:null,stress:null,red:false,...p,pain:[...(p?p.pain:[])],time:p?p.time:S.set.time,equip:[...(p?p.equip:S.set.equip)],level:(p&&p.level)||S.set.level||"beg",step:1}}
 const chip=(g,v,l,on)=>`<button class="chip" data-a="chip" data-g="${g}" data-v="${v}" aria-pressed="${on}">${l}</button>`;
-const slider=(l,k,lo,hi)=>`<label class="sl"><span>${l}<b id="v-${k}">${F[k]}</b></span><input type="range" min="1" max="10" value="${F[k]}" data-a="rng" data-k="${k}" aria-label="${l}"><span class="muted"><i style="font-style:normal">${lo}</i><i style="font-style:normal">${hi}</i></span></label>`;
 function formV(){if(!F)initF();
- return`<section class="card"><h2>Daily check-in</h2><p class="muted">Takes 30 seconds. Your answers decide today’s intensity, exercises and length.</p>
- ${slider("Sleep quality","sleep","Rough","Elite")}${slider("Energy","energy","Empty","Locked in")}${slider("Stress","stress","Calm","Maxed")}
- <h3>Pain or restriction today</h3><p class="muted">Exercises that load these areas are left out.</p>
- <div class="chips">${PAIN.map(([v,l])=>chip("pain",v,l,F.pain.includes(v))).join("")}</div>
+ const st=F.step,hd=(t,c)=>`<div class="stepbar"><i style="width:${st*20}%"></i></div><p class="muted">Step ${st} of 5 · Daily check-in</p><h2>${t}</h2><p class="muted">${c}</p>`;
+ const scale=(k,lb)=>`<div class="sc" role="group">${[2,4,6,8,10].map((v,i)=>`<button data-a="pick" data-k="${k}" data-v="${v}" aria-pressed="${F[k]!=null&&Math.round(F[k]/2)*2===v}"><span>${v}</span><small>${lb[i]}</small></button>`).join("")}</div>`;
+ const nav=(ok,last)=>`<div class="acts">${st>1?`<button class="btn ghost" data-a="back">Back</button>`:"<span></span>"}${last?`<button class="btn ${ok?"":"off"}" data-a="go">Build today’s mission</button>`:`<button class="btn ${ok?"":"off"}" data-a="next">Next</button>`}</div>`;
+ let b="";
+ if(st===1)b=hd("How did you sleep?","Choose the number that best fits last night’s sleep.")+scale("sleep",["Rough","Poor","Okay","Good","Elite"])+nav(F.sleep!=null);
+ else if(st===2)b=hd("How is your energy?","Be honest. Momentum works better when the input is real.")+scale("energy",["Empty","Low","Steady","High","Locked in"])+nav(F.energy!=null);
+ else if(st===3)b=hd("How stressed are you?","Higher stress lowers today’s recommended intensity.")+scale("stress",["Calm","Light","Moderate","High","Maxed"])+nav(F.stress!=null);
+ else if(st===4)b=hd("Any pain or restriction?","Pick every area that hurts or feels restricted. Moves that load those areas are left out.")+`<div class="chips">${PAIN.map(([v,l])=>chip("pain",v,l,F.pain.includes(v))).join("")}${chip("pain","none","No pain today",F.pain.length===0)}</div>`+nav(true);
+ else b=hd("Time and equipment","Bodyweight is always included.")+`<h3>Time</h3><div class="chips">${TIMES.map(t=>chip("time",t,t+" min",F.time===t)).join("")}</div>
+ <h3>Equipment</h3><div class="chips">${EQ.map(([v,l])=>chip("equip",v,l,F.equip.includes(v))).join("")}</div>
  ${Object.keys(S.lad).length?"":`<h3>Your training level</h3><p class="muted">Sets your starting point on each movement. After that, the app moves you up on its own.</p><div class="chips">${[["beg","Beginner"],["int","Intermediate"],["adv","Advanced"]].map(([v,l])=>chip("level",v,l,F.level===v)).join("")}</div>`}
- <h3>Time</h3><div class="chips">${TIMES.map(t=>chip("time",t,t+" min",F.time===t)).join("")}</div>
- <h3>Equipment <span class="muted">(bodyweight always included)</span></h3><div class="chips">${EQ.map(([v,l])=>chip("equip",v,l,F.equip.includes(v))).join("")}</div>
- <label style="display:flex;gap:10px;align-items:flex-start;margin-bottom:16px"><input type="checkbox" data-a="red" ${F.red?"checked":""}><span>I have sharp or worsening pain, numbness, chest pain or dizziness.</span></label>
- <button class="btn" data-a="go">Build today’s mission</button></section>`}
+ <label style="display:flex;gap:10px;align-items:flex-start;margin-top:8px"><input type="checkbox" data-a="red" ${F.red?"checked":""}><span>I have sharp or worsening pain, numbness, chest pain or dizziness.</span></label>`+nav(true,true);
+ return`<section class="card">${b}</section>`}
 function missionV(d,k){
  const{score,tier}=meta(d.ck),pain=d.ck.pain,f=focusFor(k,d.ck),sets=tier==="low"?2:d.ck.time>=45?4:3;
  const title=pain.length?"Train around it, not through it":{high:"Build with intent",mod:"Quality over quantity",low:"Restore the system"}[tier];
@@ -279,7 +288,7 @@ function missionV(d,k){
   <div class="exr">${e.unit==="m"||d.fin?"":`<input type="number" min="0" max="300" inputmode="numeric" placeholder="${t}" value="${l.a||""}" data-a="num" data-i="${i}" aria-label="Best set for ${e.name}">`}${d.fin?"":`<button data-a="swap" data-i="${i}" aria-label="Swap ${e.name}">↻</button>`}</div></div>`}).join("");
  const foot=d.fin?`<div class="card"><h3>Mission complete</h3><p>Effort ${d.fin.rpe}/10. Come back tomorrow for a fresh mission.</p>${d.fin.up.map(u=>`<p class="up">${u.startsWith("Stepped")?"▼":u.startsWith("LEVEL")||u.includes("next target")?"▲":"•"} ${u}</p>`).join("")}</div>`
  :`<div class="card"><label class="sl"><span>How hard did it feel?<b id="v-rpe">6</b></span><input id="rpe" type="range" min="1" max="10" value="6" data-a="rpe" aria-label="Effort"></label><p id="msg" class="muted"></p><button class="btn" data-a="finish">Finish workout</button> <button class="btn ghost" data-a="regen">New mix</button> <button class="btn ghost" data-a="edit">Edit check-in</button></div>`;
- return`<section class="card"><div class="hd"><div class="score">${score}</div><div><h2>${title}</h2><span class="muted">${fl} · ${d.ck.time} min target</span></div></div><p class="muted">${why}</p><div class="bar"><i style="width:${pc}%"></i></div>${rows}</section>${foot}`}
+ return`<section class="card"><div class="hd"><div class="score">${score}</div><div><h2>${title}</h2><span class="muted">${fl} · ${d.ck.time} min target</span></div></div><div class="felt"><span>Sleep <b>${d.ck.sleep}</b>/10</span><span>Energy <b>${d.ck.energy}</b>/10</span><span>Stress <b>${d.ck.stress}</b>/10</span>${pain.length?`<span>Pain <b>${pain.join(", ")}</b></span>`:""}</div><p class="muted">${why}</p><div class="bar"><i style="width:${pc}%"></i></div>${rows}</section>${foot}`}
 function todayV(){const k=today(),d=S.days[k];
  if(!d||!d.ck)return formV();
  if(!d.ck.red&&(!d.plan||d.plan.some(p=>!ex(p.n)))){d.plan=build(k,d.ck,d.salt||0);d.log={};save()}
@@ -287,6 +296,8 @@ function todayV(){const k=today(),d=S.days[k];
  return missionV(d,k)}
 function streak(){let n=0,d=new Date();if(!(S.days[key(d)]||{}).fin)d.setDate(d.getDate()-1);while((S.days[key(d)]||{}).fin){n++;d.setDate(d.getDate()-1)}return n}
 function spark(a){if(a.length<2)return`<p class="muted">Two check-ins unlock your readiness trend.</p>`;const w=300,h=70,pts=a.map((v,i)=>`${(i/(a.length-1)*w).toFixed(1)},${(h-4-v/100*(h-8)).toFixed(1)}`).join(" ");return`<svg viewBox="0 0 ${w} ${h}" class="spark" role="img" aria-label="Readiness trend"><polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/></svg>`}
+function lines(sets){const w=300,h=80,n=Math.max(...sets.map(x=>x.v.length));if(n<2)return`<p class="muted">Two check-ins unlock your trend.</p>`;const sx=i=>(i/(n-1)*w).toFixed(1),sy=v=>(h-4-(v-1)/9*(h-8)).toFixed(1);
+ return`<svg viewBox="0 0 ${w} ${h}" class="spark" role="img" aria-label="Sleep, energy and stress over your recent check-ins">${sets.map(x=>`<polyline points="${x.v.map((v,i)=>sx(i)+","+sy(v)).join(" ")}" fill="none" style="stroke:${x.c}" stroke-width="2.5" stroke-linejoin="round" stroke-dasharray="${x.d}"/>`).join("")}</svg>`}
 function progV(){
  const ks=Object.keys(S.days).sort(),fin=ks.filter(k=>S.days[k].fin),cks=ks.filter(k=>S.days[k].ck&&!S.days[k].ck.red);
  const sc=cks.slice(-14).map(k=>meta(S.days[k].ck).score),wk=[...Array(7)].filter((_,i)=>{const d=new Date();d.setDate(d.getDate()-i);return(S.days[key(d)]||{}).fin}).length;
@@ -294,9 +305,14 @@ function progV(){
  const heat=[...Array(28)].map((_,i)=>{const d=new Date();d.setDate(d.getDate()-(27-i));const k=key(d),x=S.days[k];return`<i class="${x&&x.fin?"f":x&&x.ck?"p":""}" title="${k}"></i>`}).join("");
  const hist=fin.slice(-7).reverse().map(k=>`<div class="row"><span>${k}</span><span>${meta(S.days[k].ck).score} readiness · effort ${S.days[k].fin.rpe}/10</span></div>`).join("")||`<p class="muted">Finish a workout to start your log.</p>`;
  const pr=Object.entries(S.prog).sort((a,b)=>b[1].t-a[1].t).slice(0,8).map(([n,v])=>`<div class="row"><span>${n}</span><b>${v.t} ${UL[(ex(n)||{unit:"r"}).unit]}</b></div>`).join("")||`<p class="muted">Targets rise automatically when you hit them at a manageable effort.</p>`;
+ const fk=cks.slice(-14),av=f=>fk.length?(fk.slice(-7).reduce((a,k)=>a+(+S.days[k].ck[f]||0),0)/Math.min(7,fk.length)).toFixed(1):"–";
+ const feel=fk.length?`<div class="stats" style="grid-template-columns:repeat(3,1fr)"><div class="stat"><b>${av("sleep")}</b><span>Sleep</span></div><div class="stat"><b>${av("energy")}</b><span>Energy</span></div><div class="stat"><b>${av("stress")}</b><span>Stress</span></div></div>`
+  +lines([{c:"var(--ok)",d:"0",v:fk.map(k=>+S.days[k].ck.sleep)},{c:"var(--red)",d:"7 5",v:fk.map(k=>+S.days[k].ck.energy)},{c:"var(--mu)",d:"2 5",v:fk.map(k=>+S.days[k].ck.stress)}])
+  +`<p class="muted">Solid line = sleep, dashed = energy, dotted = stress (1–10). Averages cover your last 7 check-ins.</p>`
+  +fk.slice(-7).reverse().map(k=>{const c=S.days[k].ck;return`<div class="row"><span>${k}</span><span>Sleep ${c.sleep} · Energy ${c.energy} · Stress ${c.stress}${c.pain.length?" · Pain: "+c.pain.join(", "):""}</span></div>`}).join(""):`<p class="muted">Your check-in answers show up here after your first check-in.</p>`;
  const lv=LADS.filter(l=>l.ladder).map(l=>{const i=S.lad[l.id]?l.steps.findIndex(e=>e.name===S.lad[l.id]):-1;if(i<0)return"";const n=l.steps.length;return`<div class="row"><span>${l.title}<br><small class="muted">${l.steps[i].name} · ${tierOf(l,l.steps[i])}</small></span><b>${i+1}/${n}</b></div><div class="bar"><i style="width:${Math.round((i+1)/n*100)}%"></i></div>`}).join("")||`<p class="muted">Your levels show up after your first finished workout.</p>`;
  return`<section class="card"><div class="stats"><div class="stat"><b>${streak()}</b><span>Day streak</span></div><div class="stat"><b>${wk}</b><span>This week</span></div><div class="stat"><b>${fin.length}</b><span>Total</span></div><div class="stat"><b>${avg}</b><span>Avg ready</span></div></div></section>
- <section class="card"><h3>Readiness trend</h3>${spark(sc)}</section><section class="card"><h3>Last 28 days</h3><div class="heat">${heat}</div><p class="muted">Green = finished, tinted = checked in.</p></section>
+ <section class="card"><h3>How you’ve felt</h3>${feel}</section><section class="card"><h3>Readiness trend</h3>${spark(sc)}</section><section class="card"><h3>Last 28 days</h3><div class="heat">${heat}</div><p class="muted">Green = finished, tinted = checked in.</p></section>
  <section class="card"><h3>Your levels</h3>${lv}</section><section class="card"><h3>Current targets</h3>${pr}</section><section class="card"><h3>Recent workouts</h3>${hist}</section>
  <section class="card"><h3>Backup</h3><p class="muted">Data lives only in this browser. Copy the backup text somewhere safe, or paste one here to restore.</p><textarea id="bk" aria-label="Backup data"></textarea><button class="btn ghost" data-a="bkshow">Show backup</button> <button class="btn ghost" data-a="bkload">Restore</button></section>`}
 function render(){document.querySelectorAll("nav button").forEach(b=>{const on=b.dataset.v===view;b.classList.toggle("on",on);b.setAttribute("aria-selected",on)});$("#app").innerHTML=(view==="today"?todayV():progV())+(view==="today"&&user?"":accV())}
@@ -323,8 +339,11 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b
  if(a==="vclose"||a==="vback"){closeVid();return}
  if(a==="video"){openVid(d.plan[i].n,b);return}
  if(a==="tab"){view=b.dataset.v}
- else if(a==="chip"){const g=b.dataset.g,v=b.dataset.v;if(g==="time")F.time=+v;else if(g==="level")F.level=v;else{const arr=F[g],x=arr.indexOf(v);x<0?arr.push(v):arr.splice(x,1)}}
- else if(a==="go"){const ck={...F,pain:[...F.pain],equip:[...F.equip]},prev=S.days[k];S.set.time=ck.time;S.set.equip=ck.equip;S.set.level=ck.level;const nd={ck,salt:prev?(prev.salt||0)+1:0,log:{},fin:null};if(!ck.red){awayAdj(k);nd.plan=build(k,ck,nd.salt)}S.days[k]=nd;F=null;save()}
+ else if(a==="pick"){F[b.dataset.k]=+b.dataset.v}
+ else if(a==="next"){F.step=Math.min(5,F.step+1)}
+ else if(a==="back"){F.step=Math.max(1,F.step-1)}
+ else if(a==="chip"){const g=b.dataset.g,v=b.dataset.v;if(g==="time")F.time=+v;else if(g==="level")F.level=v;else if(g==="pain"&&v==="none")F.pain=[];else{const arr=F[g],x=arr.indexOf(v);x<0?arr.push(v):arr.splice(x,1)}}
+ else if(a==="go"){const ck={...F,pain:[...F.pain],equip:[...F.equip]},prev=S.days[k];delete ck.step;ck.sleep=ck.sleep||6;ck.energy=ck.energy||6;ck.stress=ck.stress||5;S.set.time=ck.time;S.set.equip=ck.equip;S.set.level=ck.level;const nd={ck,salt:prev?(prev.salt||0)+1:0,log:{},fin:null};if(!ck.red){awayAdj(k);nd.plan=build(k,ck,nd.salt)}S.days[k]=nd;F=null;save()}
  else if(a==="edit"){F=null;initF();S.days[k]={...d,ck:null}}
  else if(a==="regen"){d.salt++;d.plan=build(k,d.ck,d.salt);d.log={};save()}
  else if(a==="tick"){const n=d.plan[i].n;d.log[n]=d.log[n]||{};d.log[n].done=!d.log[n].done;save()}
