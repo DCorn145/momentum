@@ -239,14 +239,14 @@ function mainStep(l,c,low){
  if(low)k=Math.max(0,k-1);
  return{e:av[k],k,av};
 }
-function build(k,c,salt){
- const r=rng(k+"|"+salt),{tier}=meta(c),f=focusFor(k,c),low=tier==="low";
- const seqs={lower:["mob","squat","hinge","core","squat","hinge","mob"],upper:["mob","push","pull","vpull","core","push","pull","mob"],full:["mob","squat","push","hinge","pull","vpull","core","mob"]};
- const seq=low?["mob","core","mob","hinge","mob","pull","core"]:seqs[f];
- const sets=low?2:c.time>=45?4:3,used=new Set(),uses={},plan=[];let mins=0;
+function build(k,c,salt,o){o=o||{};
+ const r=rng(k+"|"+salt),{tier}=meta(c),f=o.focus||focusFor(k,c),low=tier==="low",TM=o.time||c.time;
+ const seqs={lower:["mob","squat","hinge","core","squat","hinge","mob"],upper:["mob","push","pull","vpull","core","push","pull","mob"],full:["mob","squat","push","hinge","pull","vpull","core","mob"],mob:["mob","core","mob","core","mob","core","mob","mob"]};
+ const seq=low&&f!=="mob"?["mob","core","mob","hinge","mob","pull","core"]:seqs[f];
+ const sets=low?2:TM>=45?4:3,used=new Set(),uses={},plan=[];let mins=0;
  for(let i=0;i<20&&plan.length<10;i++){
   const p=seq[i%seq.length],est=p==="mob"?2:sets*1.7;
-  if(mins+est>c.time&&plan.length>=3)break;
+  if(mins+est>TM&&plan.length>=3)break;
   let pick=null;
   const ls=LADS.filter(l=>l.ladder&&l.pat===p).sort((a,b)=>(uses[a.id]||0)-(uses[b.id]||0));
   if(ls.length){
@@ -259,6 +259,7 @@ function build(k,c,salt){
   used.add(pick.e.name);mins+=est;plan.push({n:pick.e.name,sets:p==="mob"?1:sets,l:pick.l||null,m:!!pick.main});
  }
  if(!plan.length)plan.push({n:"90/90 Breathing",sets:1,l:null,m:false});
+ if(o.bonus)plan.forEach(p=>{p.m=false});
  return plan;
 }
 function initF(){const p=(S.days[today()]||{}).ck;F={sleep:null,energy:null,stress:null,red:false,...p,pain:[...(p?p.pain:[])],time:p?p.time:S.set.time,equip:[...(p?p.equip:S.set.equip)],level:(p&&p.level)||S.set.level||"beg",step:1}}
@@ -277,22 +278,33 @@ function formV(){if(!F)initF();
  ${Object.keys(S.lad).length?"":`<h3>Your training level</h3><p class="muted">Sets your starting point on each movement. After that, the app moves you up on its own.</p><div class="chips">${[["beg","Beginner"],["int","Intermediate"],["adv","Advanced"]].map(([v,l])=>chip("level",v,l,F.level===v)).join("")}</div>`}
  <label style="display:flex;gap:10px;align-items:flex-start;margin-top:8px"><input type="checkbox" data-a="red" ${F.red?"checked":""}><span>I have sharp or worsening pain, numbness, chest pain or dizziness.</span></label>`+nav(true,true);
  return`<section class="card">${b}</section>`}
+function rowsHTML(wk,wi){const bn=wi!=="";return wk.plan.map((p,i)=>{const e=ex(p.n),l=wk.log[p.n]||{},t=tgt(p.n),rx=e.unit==="m"?`${t} slow reps`:`${p.sets} × ${t} ${UL[e.unit]}`,L=p.l&&LADS.find(x=>x.id===p.l),lv=L?`<small class="lv">Step ${L.steps.indexOf(e)+1} of ${L.steps.length} · ${tierOf(L,e)}${p.m||bn?"":" · lighter option"}</small>`:"",w=`data-w="${wi}"`;
+  return`<div class="ex ${l.done?"on":""}"><button class="tick" data-a="tick" data-i="${i}" ${w} aria-pressed="${!!l.done}" aria-label="Mark ${e.name} done" ${wk.fin?"disabled":""}>✓</button><div><strong><button class="nm" data-a="video" data-i="${i}" ${w} aria-label="Watch ${e.name} demo">${e.name} <i aria-hidden="true">▶</i></button></strong><span>${e.cue}</span><em>${rx}</em>${lv}</div>
+  <div class="exr">${e.unit==="m"||wk.fin?"":`<input type="number" min="0" max="300" inputmode="numeric" placeholder="${t}" value="${l.a||""}" data-a="num" data-i="${i}" ${w} aria-label="Best set for ${e.name}">`}${wk.fin?"":`<button data-a="swap" data-i="${i}" ${w} aria-label="Swap ${e.name}">↻</button>`}</div></div>`}).join("")}
+const PTS_MAIN=10,PTS_BONUS=15,BLAB={lower:"Lower body",upper:"Upper body",full:"Full body",mob:"Mobility & core"};
+let BF=null;
+const bonusDone=d=>(d.bonus||[]).filter(b=>b.fin);
+function points(){let p=0,bw=0,mw=0;for(const k in S.days){const d=S.days[k];if(d.fin){p+=PTS_MAIN;mw++}const n=bonusDone(d).length;bw+=n;p+=n*PTS_BONUS}return{p,bw,mw}}
+function bonusPanel(d){const dn=bonusDone(d);return`<div class="card"><h3>Bonus workouts</h3><p class="muted">Want more today? Every bonus workout earns ${PTS_BONUS} bonus points. Levels and targets only change from your main workout.</p>${dn.map(b=>`<div class="row"><span>${BLAB[b.focus]} · ${b.time} min</span><span>effort ${b.fin.rpe}/10 · +${PTS_BONUS} pts</span></div>`).join("")}<p style="margin:12px 0 0"><button class="btn" data-a="bnew">${dn.length?"Another bonus workout":"Start a bonus workout"}</button></p></div>`}
+function bonusPickV(){
+ return`<section class="card"><h2>Bonus workout</h2><p class="muted">Choose what to add. It uses today’s check-in, so your pain areas and equipment still apply. Finish it to earn ${PTS_BONUS} bonus points.</p><h3>Focus</h3><div class="chips">${Object.entries(BLAB).map(([v,l])=>`<button class="chip" data-a="bchip" data-g="focus" data-v="${v}" aria-pressed="${BF.focus===v}">${l}</button>`).join("")}</div><h3>Time</h3><div class="chips">${[15,30,45].map(t=>`<button class="chip" data-a="bchip" data-g="time" data-v="${t}" aria-pressed="${BF.time===t}">${t} min</button>`).join("")}</div><div class="acts"><button class="btn ghost" data-a="bback">Back</button><button class="btn" data-a="bgo">Build bonus workout</button></div></section>`}
+function bonusV(d,j){const w=d.bonus[j],done=w.plan.filter(p=>w.log[p.n]&&w.log[p.n].done).length,pc=Math.round(done/w.plan.length*100);
+ return`<section class="card"><h2>Bonus workout</h2><span class="muted">${BLAB[w.focus]} · ${w.time} min target · +${PTS_BONUS} bonus points when you finish</span><p class="muted">Tick off each move as you go. Levels and targets stay the same during bonus workouts.</p><div class="bar"><i style="width:${pc}%"></i></div>${rowsHTML(w,String(j))}</section><div class="card"><label class="sl"><span>How hard did it feel?<b id="v-rpe">6</b></span><input id="rpe" type="range" min="1" max="10" value="6" data-a="rpe" aria-label="Effort"></label><p id="msg" class="muted"></p><button class="btn" data-a="finish" data-w="${j}">Finish bonus workout</button> <button class="btn ghost" data-a="regen" data-w="${j}">New mix</button> <button class="btn ghost" data-a="bcancel" data-w="${j}">Cancel</button></div>`}
 function missionV(d,k){
  const{score,tier}=meta(d.ck),pain=d.ck.pain,f=focusFor(k,d.ck),sets=tier==="low"?2:d.ck.time>=45?4:3;
  const title=pain.length?"Train around it, not through it":{high:"Build with intent",mod:"Quality over quantity",low:"Restore the system"}[tier];
  const fl=tier==="low"?"Recovery":{lower:"Lower body",upper:"Upper body",full:"Full body"}[f];
  const done=d.plan.filter(p=>d.log[p.n]&&d.log[p.n].done).length,pc=Math.round(done/d.plan.length*100);
  const why=`Readiness ${score} (${tier==="mod"?"moderate":tier}) sets ${sets} sets per move. Focus: ${fl.toLowerCase()}. ${pain.length?"Left out anything that loads: "+pain.join(", ")+". ":""}${tier==="low"?"Recovery day: one step easier, targets held. ":""}${S.gap===k?`Welcome back after ${S.gapDays} days away: targets were lowered a little. `:""}Strength moves climb their ladder when you hit the top of the rep range.`;
- const rows=d.plan.map((p,i)=>{const e=ex(p.n),l=d.log[p.n]||{},t=tgt(p.n),rx=e.unit==="m"?`${t} slow reps`:`${p.sets} × ${t} ${UL[e.unit]}`,L=p.l&&LADS.find(x=>x.id===p.l),lv=L?`<small class="lv">Step ${L.steps.indexOf(e)+1} of ${L.steps.length} · ${tierOf(L,e)}${p.m?"":" · lighter option"}</small>`:"";
-  return`<div class="ex ${l.done?"on":""}"><button class="tick" data-a="tick" data-i="${i}" aria-pressed="${!!l.done}" aria-label="Mark ${e.name} done" ${d.fin?"disabled":""}>✓</button><div><strong><button class="nm" data-a="video" data-i="${i}" aria-label="Watch ${e.name} demo">${e.name} <i aria-hidden="true">▶</i></button></strong><span>${e.cue}</span><em>${rx}</em>${lv}</div>
-  <div class="exr">${e.unit==="m"||d.fin?"":`<input type="number" min="0" max="300" inputmode="numeric" placeholder="${t}" value="${l.a||""}" data-a="num" data-i="${i}" aria-label="Best set for ${e.name}">`}${d.fin?"":`<button data-a="swap" data-i="${i}" aria-label="Swap ${e.name}">↻</button>`}</div></div>`}).join("");
- const foot=d.fin?`<div class="card"><h3>Mission complete</h3><p>Effort ${d.fin.rpe}/10. Come back tomorrow for a fresh mission.</p>${d.fin.up.map(u=>`<p class="up">${u.startsWith("Stepped")?"▼":u.startsWith("LEVEL")||u.includes("next target")?"▲":"•"} ${u}</p>`).join("")}</div>`
+ const rows=rowsHTML(d,"");
+ const foot=d.fin?`<div class="card"><h3>Mission complete</h3><p>Effort ${d.fin.rpe}/10 · +${PTS_MAIN} points. Come back tomorrow for a fresh mission, or add a bonus workout below.</p>${d.fin.up.map(u=>`<p class="up">${u.startsWith("Stepped")?"▼":u.startsWith("LEVEL")||u.includes("next target")?"▲":"•"} ${u}</p>`).join("")}</div>`+bonusPanel(d)
  :`<div class="card"><label class="sl"><span>How hard did it feel?<b id="v-rpe">6</b></span><input id="rpe" type="range" min="1" max="10" value="6" data-a="rpe" aria-label="Effort"></label><p id="msg" class="muted"></p><button class="btn" data-a="finish">Finish workout</button> <button class="btn ghost" data-a="regen">New mix</button> <button class="btn ghost" data-a="edit">Edit check-in</button></div>`;
  return`<section class="card"><div class="hd"><div class="score">${score}</div><div><h2>${title}</h2><span class="muted">${fl} · ${d.ck.time} min target</span></div></div><div class="felt"><span>Sleep <b>${d.ck.sleep}</b>/10</span><span>Energy <b>${d.ck.energy}</b>/10</span><span>Stress <b>${d.ck.stress}</b>/10</span>${pain.length?`<span>Pain <b>${pain.join(", ")}</b></span>`:""}</div><p class="muted">${why}</p><div class="bar"><i style="width:${pc}%"></i></div>${rows}</section>${foot}`}
 function todayV(){const k=today(),d=S.days[k];
  if(!d||!d.ck)return formV();
  if(!d.ck.red&&(!d.plan||d.plan.some(p=>!ex(p.n)))){d.plan=build(k,d.ck,d.salt||0);d.log={};save()}
  if(d.ck.red)return`<section class="card"><h2>Rest today</h2><p>You flagged a symptom that deserves attention. Skip training today, and have it checked by a qualified professional if it continues.</p><button class="btn ghost" data-a="edit">Edit check-in</button></section>`;
+ if(d.fin){(d.bonus||[]).forEach((w,j)=>{if(!w.fin&&w.plan.some(p=>!ex(p.n))){w.plan=build(k,d.ck,"b"+j+"-"+(w.salt||0),{focus:w.focus,time:w.time,bonus:true});w.log={}}});const j=(d.bonus||[]).findIndex(b=>!b.fin);if(j>=0)return bonusV(d,j);if(BF)return bonusPickV()}
  return missionV(d,k)}
 function streak(){let n=0,d=new Date();if(!(S.days[key(d)]||{}).fin)d.setDate(d.getDate()-1);while((S.days[key(d)]||{}).fin){n++;d.setDate(d.getDate()-1)}return n}
 function spark(a){if(a.length<2)return`<p class="muted">Two check-ins unlock your readiness trend.</p>`;const w=300,h=70,pts=a.map((v,i)=>`${(i/(a.length-1)*w).toFixed(1)},${(h-4-v/100*(h-8)).toFixed(1)}`).join(" ");return`<svg viewBox="0 0 ${w} ${h}" class="spark" role="img" aria-label="Readiness trend"><polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/></svg>`}
@@ -303,21 +315,23 @@ function progV(){
  const sc=cks.slice(-14).map(k=>meta(S.days[k].ck).score),wk=[...Array(7)].filter((_,i)=>{const d=new Date();d.setDate(d.getDate()-i);return(S.days[key(d)]||{}).fin}).length;
  const avg=sc.length?Math.round(sc.slice(-7).reduce((a,b)=>a+b,0)/Math.min(7,sc.length)):"–";
  const heat=[...Array(28)].map((_,i)=>{const d=new Date();d.setDate(d.getDate()-(27-i));const k=key(d),x=S.days[k];return`<i class="${x&&x.fin?"f":x&&x.ck?"p":""}" title="${k}"></i>`}).join("");
- const hist=fin.slice(-7).reverse().map(k=>`<div class="row"><span>${k}</span><span>${meta(S.days[k].ck).score} readiness · effort ${S.days[k].fin.rpe}/10</span></div>`).join("")||`<p class="muted">Finish a workout to start your log.</p>`;
+ const hist=fin.slice(-7).reverse().map(k=>`<div class="row"><span>${k}</span><span>${meta(S.days[k].ck).score} readiness · effort ${S.days[k].fin.rpe}/10${bonusDone(S.days[k]).length?` · +${bonusDone(S.days[k]).length} bonus`:""}</span></div>`).join("")||`<p class="muted">Finish a workout to start your log.</p>`;
  const pr=Object.entries(S.prog).sort((a,b)=>b[1].t-a[1].t).slice(0,8).map(([n,v])=>`<div class="row"><span>${n}</span><b>${v.t} ${UL[(ex(n)||{unit:"r"}).unit]}</b></div>`).join("")||`<p class="muted">Targets rise automatically when you hit them at a manageable effort.</p>`;
  const fk=cks.slice(-14),av=f=>fk.length?(fk.slice(-7).reduce((a,k)=>a+(+S.days[k].ck[f]||0),0)/Math.min(7,fk.length)).toFixed(1):"–";
  const feel=fk.length?`<div class="stats" style="grid-template-columns:repeat(3,1fr)"><div class="stat"><b>${av("sleep")}</b><span>Sleep</span></div><div class="stat"><b>${av("energy")}</b><span>Energy</span></div><div class="stat"><b>${av("stress")}</b><span>Stress</span></div></div>`
   +lines([{c:"var(--ok)",d:"0",v:fk.map(k=>+S.days[k].ck.sleep)},{c:"var(--red)",d:"7 5",v:fk.map(k=>+S.days[k].ck.energy)},{c:"var(--mu)",d:"2 5",v:fk.map(k=>+S.days[k].ck.stress)}])
   +`<p class="muted">Solid line = sleep, dashed = energy, dotted = stress (1–10). Averages cover your last 7 check-ins.</p>`
   +fk.slice(-7).reverse().map(k=>{const c=S.days[k].ck;return`<div class="row"><span>${k}</span><span>Sleep ${c.sleep} · Energy ${c.energy} · Stress ${c.stress}${c.pain.length?" · Pain: "+c.pain.join(", "):""}</span></div>`}).join(""):`<p class="muted">Your check-in answers show up here after your first check-in.</p>`;
+ const pts=points();
  const lv=LADS.filter(l=>l.ladder).map(l=>{const i=S.lad[l.id]?l.steps.findIndex(e=>e.name===S.lad[l.id]):-1;if(i<0)return"";const n=l.steps.length;return`<div class="row"><span>${l.title}<br><small class="muted">${l.steps[i].name} · ${tierOf(l,l.steps[i])}</small></span><b>${i+1}/${n}</b></div><div class="bar"><i style="width:${Math.round((i+1)/n*100)}%"></i></div>`}).join("")||`<p class="muted">Your levels show up after your first finished workout.</p>`;
  return`<section class="card"><div class="stats"><div class="stat"><b>${streak()}</b><span>Day streak</span></div><div class="stat"><b>${wk}</b><span>This week</span></div><div class="stat"><b>${fin.length}</b><span>Total</span></div><div class="stat"><b>${avg}</b><span>Avg ready</span></div></div></section>
- <section class="card"><h3>How you’ve felt</h3>${feel}</section><section class="card"><h3>Readiness trend</h3>${spark(sc)}</section><section class="card"><h3>Last 28 days</h3><div class="heat">${heat}</div><p class="muted">Green = finished, tinted = checked in.</p></section>
+ <section class="card"><h3>Points</h3><div class="stats" style="grid-template-columns:repeat(3,1fr)"><div class="stat"><b>${pts.p}</b><span>Points</span></div><div class="stat"><b>${pts.bw}</b><span>Bonus workouts</span></div><div class="stat"><b>${pts.mw+pts.bw}</b><span>All workouts</span></div></div><p class="muted">${PTS_MAIN} points for each daily mission, ${PTS_BONUS} bonus points for each bonus workout.</p></section><section class="card"><h3>How you’ve felt</h3>${feel}</section><section class="card"><h3>Readiness trend</h3>${spark(sc)}</section><section class="card"><h3>Last 28 days</h3><div class="heat">${heat}</div><p class="muted">Green = finished, tinted = checked in.</p></section>
  <section class="card"><h3>Your levels</h3>${lv}</section><section class="card"><h3>Current targets</h3>${pr}</section><section class="card"><h3>Recent workouts</h3>${hist}</section>
  <section class="card"><h3>Backup</h3><p class="muted">Data lives only in this browser. Copy the backup text somewhere safe, or paste one here to restore.</p><textarea id="bk" aria-label="Backup data"></textarea><button class="btn ghost" data-a="bkshow">Show backup</button> <button class="btn ghost" data-a="bkload">Restore</button></section>`}
 function render(){document.querySelectorAll("nav button").forEach(b=>{const on=b.dataset.v===view;b.classList.toggle("on",on);b.setAttribute("aria-selected",on)});$("#app").innerHTML=(view==="today"?todayV():progV())+(view==="today"&&user?"":accV())}
-function finish(){const k=today(),d=S.days[k],rpe=+$("#rpe").value,up=[];
- if(!d.plan.some(p=>d.log[p.n]&&d.log[p.n].done)){$("#msg").textContent="Tick off at least one exercise first.";return}
+function finish(wi){const k=today(),d=S.days[k],bn=wi!==undefined&&wi!=="",wk=bn?d.bonus[+wi]:d,rpe=+$("#rpe").value,up=[];
+ if(!wk.plan.some(p=>wk.log[p.n]&&wk.log[p.n].done)){$("#msg").textContent="Tick off at least one exercise first.";return}
+ if(bn){up.push(`Bonus workout done: +${PTS_BONUS} bonus points.`);wk.fin={rpe,up,at:Date.now()};save();render();return}
  const low=meta(d.ck).tier==="low";
  if(low)up.push("Recovery day: targets held, no level changes.");
  else d.plan.forEach(p=>{const l=d.log[p.n];if(!l||!l.done)return;const e=ex(p.n);if(!e||e.unit==="m")return;
@@ -334,10 +348,10 @@ function finish(){const k=today(),d=S.days[k],rpe=+$("#rpe").value,up=[];
    else{up.push(`${e.name}: still tough at the lowest target. Keep the effort lower and focus on clean form.`)}
   }});
  d.fin={rpe,up,at:Date.now()};save();render()}
-document.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b||b.tagName==="INPUT")return;const a=b.dataset.a,k=today(),d=S.days[k],i=+b.dataset.i;
+document.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b||b.tagName==="INPUT")return;const a=b.dataset.a,k=today(),d=S.days[k],i=+b.dataset.i,w=d&&b.dataset.w!==undefined&&b.dataset.w!==""?d.bonus[+b.dataset.w]:d;
  if(a==="vback"&&e.target!==b)return;
  if(a==="vclose"||a==="vback"){closeVid();return}
- if(a==="video"){openVid(d.plan[i].n,b);return}
+ if(a==="video"){openVid(w.plan[i].n,b);return}
  if(a==="tab"){view=b.dataset.v}
  else if(a==="pick"){F[b.dataset.k]=+b.dataset.v}
  else if(a==="next"){F.step=Math.min(5,F.step+1)}
@@ -345,12 +359,17 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b
  else if(a==="chip"){const g=b.dataset.g,v=b.dataset.v;if(g==="time")F.time=+v;else if(g==="level")F.level=v;else if(g==="pain"&&v==="none")F.pain=[];else{const arr=F[g],x=arr.indexOf(v);x<0?arr.push(v):arr.splice(x,1)}}
  else if(a==="go"){const ck={...F,pain:[...F.pain],equip:[...F.equip]},prev=S.days[k];delete ck.step;ck.sleep=ck.sleep||6;ck.energy=ck.energy||6;ck.stress=ck.stress||5;S.set.time=ck.time;S.set.equip=ck.equip;S.set.level=ck.level;const nd={ck,salt:prev?(prev.salt||0)+1:0,log:{},fin:null};if(!ck.red){awayAdj(k);nd.plan=build(k,ck,nd.salt)}S.days[k]=nd;F=null;save()}
  else if(a==="edit"){F=null;initF();S.days[k]={...d,ck:null}}
- else if(a==="regen"){d.salt++;d.plan=build(k,d.ck,d.salt);d.log={};save()}
- else if(a==="tick"){const n=d.plan[i].n;d.log[n]=d.log[n]||{};d.log[n].done=!d.log[n].done;save()}
- else if(a==="swap"){const p=d.plan[i],e=ex(p.n),inPlan=new Set(d.plan.map(x=>x.n)),L=p.l&&LADS.find(x=>x.id===p.l);
+ else if(a==="regen"){if(w!==d){w.salt=(w.salt||0)+1;w.plan=build(k,d.ck,"b"+b.dataset.w+"-"+w.salt,{focus:w.focus,time:w.time,bonus:true});w.log={}}else{d.salt++;d.plan=build(k,d.ck,d.salt);d.log={}}save()}
+ else if(a==="tick"){const n=w.plan[i].n;w.log[n]=w.log[n]||{};w.log[n].done=!w.log[n].done;save()}
+ else if(a==="swap"){const p=w.plan[i],e=ex(p.n),inPlan=new Set(w.plan.map(x=>x.n)),L=p.l&&LADS.find(x=>x.id===p.l);
   const pl=L?availOf(L,d.ck).filter(x=>!inPlan.has(x.name)&&L.steps.indexOf(x)<=L.steps.indexOf(e)).reverse():pool(e.pat,d.ck,inPlan);
-  if(pl.length){const r=rng(k+"|swap|"+(d.sw=(d.sw||0)+1));delete d.log[p.n];const nx=pl[Math.floor(r()*Math.min(4,pl.length))];if(L)p.m=false;p.n=nx.name;save()}}
- else if(a==="finish"){finish();return}
+  if(pl.length){const r=rng(k+"|swap|"+(w.sw=(w.sw||0)+1));delete w.log[p.n];const nx=pl[Math.floor(r()*Math.min(4,pl.length))];if(L)p.m=false;p.n=nx.name;save()}}
+ else if(a==="finish"){finish(b.dataset.w);return}
+ else if(a==="bnew"){const m=focusFor(k,d.ck);BF={focus:{lower:"upper",upper:"lower",full:"mob"}[m]||"full",time:30}}
+ else if(a==="bchip"){BF[b.dataset.g]=b.dataset.g==="time"?+b.dataset.v:b.dataset.v}
+ else if(a==="bback"){BF=null}
+ else if(a==="bgo"){d.bonus=d.bonus||[];const j=d.bonus.length;d.bonus.push({focus:BF.focus,time:BF.time,salt:0,plan:build(k,d.ck,"b"+j+"-0",{focus:BF.focus,time:BF.time,bonus:true}),log:{},fin:null,at:Date.now()});BF=null;save()}
+ else if(a==="bcancel"){d.bonus.splice(+b.dataset.w,1);save()}
  else if(a==="login"){login();return}
  else if(a==="logout"){S=fresh();try{localStorage.removeItem(KEY)}catch(err){}sb.auth.signOut();return}
  else if(a==="bkshow"){$("#bk").value=JSON.stringify(S);return}
@@ -360,10 +379,10 @@ document.addEventListener("input",e=>{const t=e.target,a=t.dataset.a;if(!a)retur
  if(a==="rng"){F[t.dataset.k]=+t.value;$("#v-"+t.dataset.k).textContent=t.value}
  else if(a==="rpe"){$("#v-rpe").textContent=t.value}
  else if(a==="red"){F.red=t.checked}
- else if(a==="num"){const d=S.days[today()],n=d.plan[+t.dataset.i].n;d.log[n]=d.log[n]||{};d.log[n].a=+t.value;save()}});
+ else if(a==="num"){const d=S.days[today()],wk=t.dataset.w?d.bonus[+t.dataset.w]:d,n=wk.plan[+t.dataset.i].n;wk.log[n]=wk.log[n]||{};wk.log[n].a=+t.value;save()}});
 function accV(){if(!sb)return"";return user?`<section class="card"><h3>Account</h3><p class="muted">Signed in as ${user.email}. Your progress syncs across devices.</p><button class="btn ghost" data-a="logout">Sign out</button></section>`:`<section class="card"><h3>Save your progress</h3><p class="muted">Sign in with your email to keep your streak and targets on every device. No password needed.</p><input id="em" type="email" placeholder="you@email.com" autocomplete="email" aria-label="Email" style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--ln);background:var(--sf2);color:var(--tx);margin-bottom:10px"><button class="btn" data-a="login">Email me a sign-in link</button><p id="am" class="muted"></p></section>`}
 async function login(){const em=$("#em").value.trim(),m=$("#am");if(!em){m.textContent="Enter your email first.";return}m.textContent="Sending…";const{error}=await sb.auth.signInWithOtp({email:em,options:{emailRedirectTo:location.origin+location.pathname}});m.textContent=error?error.message:"Check your email for the sign-in link."}
-function mergeS(a,b){const m={...fresh(),...a,days:{...b.days,...a.days},prog:{...a.prog},lad:{...(b.lad||{}),...(a.lad||{})}};for(const k in b.days){const x=a.days[k],y=b.days[k];if(x&&y&&y.fin&&!x.fin)m.days[k]=y}for(const n in(b.prog||{})){if(!m.prog[n]||b.prog[n].t>m.prog[n].t)m.prog[n]=b.prog[n]}for(const id in(b.lad||{})){const L=LADS.find(x=>x.id===id),ai=L?L.steps.findIndex(e=>e.name===(a.lad||{})[id]):-1,bi=L?L.steps.findIndex(e=>e.name===b.lad[id]):-1;if(bi>ai)m.lad[id]=b.lad[id]}return m}
+function mergeS(a,b){const m={...fresh(),...a,days:{...b.days,...a.days},prog:{...a.prog},lad:{...(b.lad||{}),...(a.lad||{})}};for(const k in b.days){const x=a.days[k],y=b.days[k];if(x&&y&&((y.fin&&!x.fin)||bonusDone(y).length>bonusDone(x).length))m.days[k]=y}for(const n in(b.prog||{})){if(!m.prog[n]||b.prog[n].t>m.prog[n].t)m.prog[n]=b.prog[n]}for(const id in(b.lad||{})){const L=LADS.find(x=>x.id===id),ai=L?L.steps.findIndex(e=>e.name===(a.lad||{})[id]):-1,bi=L?L.steps.findIndex(e=>e.name===b.lad[id]):-1;if(bi>ai)m.lad[id]=b.lad[id]}return m}
 async function pull(){if(!sb||!user)return;try{const{data}=await sb.from("progress").select("data").eq("user_id",user.id).maybeSingle();if(data&&data.data&&data.data.days)S=mergeS(S,data.data);try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}await push()}catch(e){}render()}
 async function push(){if(!sb||!user)return;try{await sb.from("progress").upsert({user_id:user.id,data:S,updated_at:new Date().toISOString()})}catch(e){}}
 if(sb){sb.auth.onAuthStateChange((ev,sess)=>{user=sess?sess.user:null;if(user)setTimeout(pull,0);else render()})}
