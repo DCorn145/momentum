@@ -105,7 +105,7 @@ const EQ=[["db","Dumbbells"],["band","Band"],["kb","Kettlebell"]],TIMES=[15,30,4
 const fresh=()=>({days:{},prog:{},set:{equip:[],time:30}});
 function load(){try{const s=JSON.parse(localStorage.getItem(KEY));return s&&s.days?{...fresh(),...s}:fresh()}catch(e){return fresh()}}
 /* ---- Supabase settings: paste yours here (see SETUP steps). The anon key is safe to be public. ---- */
-const SB_URL="PASTE_YOUR_SUPABASE_URL",SB_KEY="PASTE_YOUR_ANON_KEY";
+const SB_URL="https://ynmtqanqdgpogkxvbrel.supabase.co",SB_KEY="Psb_publishable_-LF-QqehxhJ4eG3nZoWOIg_IFP7aMqo";
 const sb=(window.supabase&&SB_URL.startsWith("https://"))?window.supabase.createClient(SB_URL,SB_KEY):null;
 let S=load(),view="today",F=null,user=null,pt;
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(user){clearTimeout(pt);pt=setTimeout(push,1500)}}
