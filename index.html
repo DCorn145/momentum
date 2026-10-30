@@ -25,7 +25,7 @@
 body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 'Barlow',system-ui,sans-serif}
 .wrap{max-width:720px;margin:auto;padding:14px}
 header{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
-.logo{font:20px 'Russo One',Impact,sans-serif;letter-spacing:2px}.logo b{color:var(--red)}.logo small{display:block;font:600 11px 'Barlow',sans-serif;letter-spacing:2px;color:var(--mu);text-transform:uppercase}
+.logo{font:20px 'Russo One',Impact,sans-serif;letter-spacing:2px}.logo b{color:var(--red);font-size:1.3em;line-height:0;vertical-align:-.06em}.logo small{display:block;font:600 11px 'Barlow',sans-serif;letter-spacing:2px;color:var(--mu);text-transform:uppercase}
 nav{display:flex;gap:4px;background:var(--sf2);padding:4px;border-radius:12px}
 nav button{border:0;background:none;color:var(--mu);padding:8px 16px;border-radius:9px;font-weight:700;cursor:pointer}
 nav button.on{background:var(--red);color:#fff}
@@ -63,6 +63,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--red);outline-of
 .exr input.w{width:78px}
 .pt{border-collapse:collapse;margin:8px 0;font-size:14px}.pt th,.pt td{padding:4px 18px 4px 0;border-bottom:1px solid var(--ln);text-align:left}
 details{margin-top:12px}summary{cursor:pointer;font-weight:700}
+.hb{padding:9px 16px;font-size:14px}
 .exr{display:flex;gap:6px;align-items:center}.exr input{width:58px;padding:8px;border-radius:9px;border:1px solid var(--ln);background:var(--sf2);color:var(--tx)}
 .exr button{border:0;background:var(--sf2);color:var(--tx);width:38px;height:38px;border-radius:10px;font-size:18px;cursor:pointer}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.stat{background:var(--sf2);border-radius:14px;padding:12px 6px;text-align:center}.stat b{display:block;font:24px 'Russo One',Impact,sans-serif}.stat span{font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:1px}
@@ -77,7 +78,7 @@ textarea{width:100%;height:90px;background:var(--sf2);color:var(--tx);border:1px
 </head>
 <body>
 <div class="wrap">
-<header><div class="logo">M<b>O</b>MENTUM<small id="sub">Daily Mission</small></div>
+<header><div class="logo"><span role="img" aria-label="Momentum">M<b>☻</b>MENTUM</span><small id="sub">Daily Mission</small></div>
 <nav role="tablist" aria-label="Sections"><button role="tab" data-a="tab" data-v="today">Today</button><button role="tab" data-a="tab" data-v="prog">Progress</button></nav><button id="who" class="chip" data-a="logout" hidden>Sign out</button></header>
 <main id="app" aria-live="polite"></main>
 <p class="fine">Momentum offers educational fitness guidance, not medical advice, diagnosis or treatment. Stop any exercise that causes sharp, worsening or unusual pain, and check with your doctor before starting a new program.</p>
@@ -252,7 +253,7 @@ const fresh=()=>({days:{},prog:{},lad:{},wt:{},owner:null,set:{equip:[],time:30,
 function load(){try{const s=JSON.parse(localStorage.getItem(KEY));return s&&s.days?{...fresh(),...s}:fresh()}catch(e){return fresh()}}
 /* ---- Supabase settings: paste yours here (see SETUP steps). The anon key is safe to be public. ---- */
 const SB_URL="https://ynmtqanqdgpogkxvbrel.supabase.co",SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlubXRxYW5xZGdwb2dreHZicmVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMxOTk1NzIsImV4cCI6MjEwODc3NTU3Mn0.msfx5ZQOlDmhy7Ir7WBdcQXnGw4igLjA5pDcV4ktp7A";
-const sb=(window.supabase&&SB_URL.startsWith("https://"))?window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}):null;
+let sb=null;
 let S=load(),view="today",F=null,user=null,pt,synced=false,authReady=false,otpEmail=null;
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(user){clearTimeout(pt);pt=setTimeout(push,1500)}}
 const key=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
@@ -309,8 +310,8 @@ function formV(){if(!F)initF();
  else if(st===2)b=hd("How is your energy?","Be honest. Momentum works better when the input is real.")+scale("energy",["Empty","Low","Steady","High","Locked in"])+nav(F.energy!=null);
  else if(st===3)b=hd("How stressed are you?","Higher stress lowers today’s recommended intensity.")+scale("stress",["Calm","Light","Moderate","High","Maxed"])+nav(F.stress!=null);
  else if(st===4)b=hd("Any pain or restriction?","Pick every area that hurts or feels restricted. Moves that load those areas are left out.")+`<div class="chips">${PAIN.map(([v,l])=>chip("pain",v,l,F.pain.includes(v))).join("")}${chip("pain","none","No pain today",F.pain.length===0)}</div>`+nav(true);
- else b=hd("Time and equipment","Bodyweight is always included.")+`<h3>Time</h3><div class="chips">${TIMES.map(t=>chip("time",t,t+" min",F.time===t)).join("")}</div>
- <h3>Equipment</h3><div class="chips">${EQ.map(([v,l])=>chip("equip",v,l,F.equip.includes(v))).join("")}</div>
+ else b=hd("Time and equipment","Pick what you have. Bodyweight moves are always included.")+`<h3>Time</h3><div class="chips">${TIMES.map(t=>chip("time",t,t+" min",F.time===t)).join("")}</div>
+ <h3>Equipment</h3><div class="chips">${chip("equip","none","Bodyweight only (at home)",F.equip.length===0)}${EQ.map(([v,l])=>chip("equip",v,l,F.equip.includes(v))).join("")}</div>${F.equip.length===0?`<p class="muted">Only moves that need no equipment, all doable at home.</p>`:""}
  <h3>Weight units</h3><div class="chips">${[["lb","Pounds (lb)"],["kg","Kilograms (kg)"]].map(([v,l])=>chip("units",v,l,F.units===v)).join("")}</div>
  ${Object.keys(S.lad).length?"":`<h3>Your training level</h3><p class="muted">Sets your starting point on each movement. After that, the app moves you up on its own.</p><div class="chips">${[["beg","Beginner"],["int","Intermediate"],["adv","Advanced"]].map(([v,l])=>chip("level",v,l,F.level===v)).join("")}</div>`}
  <label style="display:flex;gap:10px;align-items:flex-start;margin-top:8px"><input type="checkbox" data-a="red" ${F.red?"checked":""}><span>I have sharp or worsening pain, numbness, chest pain or dizziness.</span></label>`+nav(true,true);
@@ -367,8 +368,8 @@ function progV(){
  <section class="card"><h3>Points</h3><div class="stats" style="grid-template-columns:repeat(3,1fr)"><div class="stat"><b>${pts.p}</b><span>Points</span></div><div class="stat"><b>${pts.bw}</b><span>Bonus workouts</span></div><div class="stat"><b>${pts.mw+pts.bw}</b><span>All workouts</span></div></div><p class="muted">${PTS_MAIN} points for each daily mission, ${PTS_BONUS} bonus points for each bonus workout.</p></section><section class="card"><h3>How you’ve felt</h3>${feel}</section><section class="card"><h3>Readiness trend</h3>${spark(sc)}</section><section class="card"><h3>Last 28 days</h3><div class="heat">${heat}</div><p class="muted">Green = finished, tinted = checked in.</p></section>
  <section class="card"><h3>Your levels</h3>${lv}</section>${wcard}<section class="card"><h3>Current targets</h3>${pr}</section><section class="card"><h3>Recent workouts</h3>${hist}</section>
  <section class="card"><h3>Backup</h3><p class="muted">Data lives only in this browser. Copy the backup text somewhere safe, or paste one here to restore.</p><textarea id="bk" aria-label="Backup data"></textarea><button class="btn ghost" data-a="bkshow">Show backup</button> <button class="btn ghost" data-a="bkload">Restore</button></section>`}
-function render(){const sbt=$("#sub");if(sbt)sbt.textContent=user?"Signed in · "+user.email:"Daily Mission";const wb=$("#who");if(wb){wb.hidden=!user;wb.textContent="Sign out";wb.setAttribute("aria-label",user?"Sign out of "+user.email:"Sign out")}
-document.querySelectorAll("nav button").forEach(b=>{const on=b.dataset.v===view;b.classList.toggle("on",on);b.setAttribute("aria-selected",on)});$("#app").innerHTML=(view==="today"?todayV():progV())+(view==="today"&&user?"":accV())}
+function render(){const sbt=$("#sub");if(sbt)sbt.textContent=user?"Signed in · "+user.email:"Daily Mission";const wb=$("#who");if(wb){wb.hidden=!(user||!sb||authReady);wb.className=user?"chip":"btn hb";wb.textContent=user?"Sign out":"Sign in";wb.setAttribute("data-a",user?"logout":"gosign");wb.setAttribute("aria-label",user?"Sign out of "+user.email:"Sign in")}
+document.querySelectorAll("nav button").forEach(b=>{const on=b.dataset.v===view;b.classList.toggle("on",on);b.setAttribute("aria-selected",on)});$("#app").innerHTML=(view==="signin"?signinV():view==="today"?todayV():progV())+(view==="signin"||(view==="today"&&user)?"":accV())}
 function finish(wi){const k=today(),d=S.days[k],bn=wi!==undefined&&wi!=="",wk=bn?d.bonus[+wi]:d,rpe=+$("#rpe").value,up=[];
  if(!wk.plan.some(p=>wk.log[p.n]&&wk.log[p.n].done)){$("#msg").textContent="Tick off at least one exercise first.";return}
  const nw=recW(wk,k);if(nw)up.push(`Weights saved for ${nw} exercise${nw>1?"s":""}.`);
@@ -397,7 +398,7 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b
  else if(a==="pick"){F[b.dataset.k]=+b.dataset.v}
  else if(a==="next"){F.step=Math.min(5,F.step+1)}
  else if(a==="back"){F.step=Math.max(1,F.step-1)}
- else if(a==="chip"){const g=b.dataset.g,v=b.dataset.v;if(g==="time")F.time=+v;else if(g==="level")F.level=v;else if(g==="units")F.units=v;else if(g==="pain"&&v==="none")F.pain=[];else{const arr=F[g],x=arr.indexOf(v);x<0?arr.push(v):arr.splice(x,1)}}
+ else if(a==="chip"){const g=b.dataset.g,v=b.dataset.v;if(g==="time")F.time=+v;else if(g==="level")F.level=v;else if(g==="units")F.units=v;else if(g==="pain"&&v==="none")F.pain=[];else if(g==="equip"&&v==="none")F.equip=[];else{const arr=F[g],x=arr.indexOf(v);x<0?arr.push(v):arr.splice(x,1)}}
  else if(a==="go"){const ck={...F,pain:[...F.pain],equip:[...F.equip]},prev=S.days[k];delete ck.step;ck.sleep=ck.sleep||6;ck.energy=ck.energy||6;ck.stress=ck.stress||5;S.set.time=ck.time;S.set.equip=ck.equip;S.set.level=ck.level;S.set.units=ck.units||S.set.units||"lb";delete ck.units;const nd={ck,salt:prev?(prev.salt||0)+1:0,log:{},fin:null};if(!ck.red){awayAdj(k);nd.plan=build(k,ck,nd.salt)}S.days[k]=nd;F=null;save()}
  else if(a==="edit"){F=null;initF();S.days[k]={...d,ck:null}}
  else if(a==="regen"){if(w!==d){w.salt=(w.salt||0)+1;w.plan=build(k,d.ck,"b"+b.dataset.w+"-"+w.salt,{focus:w.focus,time:w.time,bonus:true});w.log={}}else{d.salt++;d.plan=build(k,d.ck,d.salt);d.log={}}save()}
@@ -415,6 +416,7 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b
  else if(a==="login"){login();return}
  else if(a==="verify"){verify();return}
  else if(a==="otpback"){otpEmail=null}
+ else if(a==="gosign"){view="signin";try{scrollTo(0,0)}catch(e){}}
  else if(a==="logout"){logout(b);return}
  else if(a==="bkshow"){$("#bk").value=JSON.stringify(S);return}
  else if(a==="bkload"){try{const x=JSON.parse($("#bk").value);if(x&&x.days){S={...fresh(),...x};save()}}catch(err){$("#bk").value="Could not read that backup."}}
@@ -425,6 +427,10 @@ document.addEventListener("input",e=>{const t=e.target,a=t.dataset.a;if(!a)retur
  else if(a==="red"){F.red=t.checked}
  else if(a==="num"){const d=S.days[today()],wk=t.dataset.w?d.bonus[+t.dataset.w]:d,n=wk.plan[+t.dataset.i].n;wk.log[n]=wk.log[n]||{};wk.log[n].a=+t.value;save()}
  else if(a==="wt"){const d=S.days[today()],wk=t.dataset.w?d.bonus[+t.dataset.w]:d,n=wk.plan[+t.dataset.i].n;wk.log[n]=wk.log[n]||{};const v=parseFloat(t.value);if(v>0)wk.log[n].kg=fromU(Math.min(v,2000));else delete wk.log[n].kg;save()}});
+function signinV(){const hd=`<section class="card"><h2>Sign in</h2><p class="muted">Sign in with your email from any browser or device. Your workouts, levels, weights and points stay with that email.</p></section>`,bk=`<p><button class="btn ghost" data-a="tab" data-v="today">Back</button></p>`;
+ if(!sb)return hd+`<section class="card"><h3>Sign-in unavailable</h3><p class="muted">The sign-in service didn’t load. Check your connection, then close and reopen the app. If you use a content blocker, allow this site.</p></section>`+bk;
+ if(!authReady)return hd+`<section class="card"><p class="muted">Checking your sign-in…</p></section>`+bk;
+ return hd+accV()+bk}
 const esc=t=>String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function accV(){if(!sb||!authReady)return"";
  if(user)return`<section class="card"><h3>Account</h3><p class="muted">Signed in as ${esc(user.email)}. This device stays signed in until you tap Sign out.</p><button class="btn ghost" data-a="logout">Sign out</button></section>`;
@@ -436,22 +442,29 @@ async function verify(){const code=($("#otp").value||"").replace(/\s/g,""),m=$("
  for(const type of["email","magiclink","signup"]){const r=await sb.auth.verifyOtp({email:otpEmail,token:code,type});if(!r.error){otpEmail=null;return}}
  m.textContent="That code didn’t work. Check it and try again, or go back and request a new one."}
 function mergeS(a,b){const m={...fresh(),...a,days:{...b.days,...a.days},prog:{...a.prog},lad:{...(b.lad||{}),...(a.lad||{})},wt:mergeWt(a.wt,b.wt)};for(const k in b.days){const x=a.days[k],y=b.days[k];if(x&&y&&((y.fin&&!x.fin)||bonusDone(y).length>bonusDone(x).length))m.days[k]=y}for(const n in(b.prog||{})){if(!m.prog[n]||b.prog[n].t>m.prog[n].t)m.prog[n]=b.prog[n]}for(const id in(b.lad||{})){const L=LADS.find(x=>x.id===id),ai=L?L.steps.findIndex(e=>e.name===(a.lad||{})[id]):-1,bi=L?L.steps.findIndex(e=>e.name===b.lad[id]):-1;if(bi>ai)m.lad[id]=b.lad[id]}return m}
-async function pull(){if(!sb||!user)return;const uid=user.id;let ok=false;try{
+async function pull(quiet){if(!sb||!user)return;const uid=user.id,before=quiet?JSON.stringify(S):null;let ok=false;try{
  const r=await sb.from("progress").select("data").eq("user_id",uid).maybeSingle();if(r.error)throw r.error;if(!user||user.id!==uid)return;
  const cloud=r.data&&r.data.data&&r.data.data.days?r.data.data:null;
  if(S.owner&&S.owner!==uid)S=cloud?{...fresh(),...cloud}:fresh();else if(cloud)S=mergeS(S,cloud);
  S.owner=uid;synced=true;ok=true;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}await push()
  }catch(e){if(user&&user.id===uid&&S.owner&&S.owner!==uid){S=fresh();try{localStorage.removeItem(KEY)}catch(x){}}}
- render()}
+ if(!quiet||JSON.stringify(S)!==before)render()}
 async function push(){if(!sb||!user)return false;if(!synced){await pull();return synced}try{const r=await sb.from("progress").upsert({user_id:user.id,data:S,updated_at:new Date().toISOString()});return!(r&&r.error)}catch(e){return false}}
 async function logout(b){if(!sb)return;clearTimeout(pt);if(b)b.textContent="Saving…";const ok=await push();if(!ok){if(b)b.textContent="Couldn’t save. Try again";return}
  S=fresh();try{localStorage.removeItem(KEY)}catch(e){}try{await sb.auth.signOut()}catch(e){}user=null;view="today";F=null;render()}
-if(sb){sb.auth.onAuthStateChange((ev,sess)=>{authReady=true;const nu=sess?sess.user:null,changed=!!nu&&(!user||user.id!==nu.id);user=nu;
- if(!user){synced=false;render();return}
- try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
- if(changed||!synced){if(changed)synced=false;setTimeout(pull,0)}});
+function initSb(){if(sb||!window.supabase||!SB_URL.startsWith("https://"))return;
+ sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+ sb.auth.onAuthStateChange((ev,sess)=>{authReady=true;const nu=sess?sess.user:null,changed=!!nu&&(!user||user.id!==nu.id);user=nu;
+  if(!user){synced=false;render();return}
+  try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
+  if(changed&&view==="signin")view="today";
+  if(changed||!synced){if(changed)synced=false;setTimeout(pull,0)}});
  setTimeout(()=>{if(!authReady){authReady=true;render()}},2500)}
-try{const l=document.querySelector('link[rel="apple-touch-icon"]');if(l){const im=new Image();im.onerror=()=>{try{const c=document.createElement("canvas");c.width=c.height=180;const x=c.getContext("2d");x.fillStyle="#070707";x.fillRect(0,0,180,180);x.fillStyle="#ff2a34";x.beginPath();x.arc(90,90,65,0,7);x.fill();x.fillStyle="#fff";x.font="bold 76px Arial,Helvetica,sans-serif";x.textAlign="center";x.textBaseline="middle";x.fillText("M",90,94);l.href=c.toDataURL("image/png")}catch(e){}};im.src=l.href}}catch(e){}
+initSb();
+if(!sb&&SB_URL.startsWith("https://")){try{const sc=document.createElement("script");sc.src="https://unpkg.com/@supabase/supabase-js@2.45.4/dist/umd/supabase.js";sc.onload=()=>{initSb();render()};document.head.appendChild(sc)}catch(e){}}
+document.addEventListener("visibilitychange",()=>{if(!user||!synced)return;if(document.visibilityState==="hidden"){clearTimeout(pt);push()}else pull(true)});
+addEventListener("pagehide",()=>{if(user&&synced){clearTimeout(pt);push()}});
+try{const l=document.querySelector('link[rel="apple-touch-icon"]');if(l){const im=new Image();im.onerror=()=>{try{const c=document.createElement("canvas");c.width=c.height=180;const x=c.getContext("2d");x.fillStyle="#070707";x.fillRect(0,0,180,180);x.fillStyle="#ff2a34";x.beginPath();x.arc(90,90,65,0,7);x.fill();x.fillStyle="#fff";x.font="bold 54px Arial,Helvetica,sans-serif";x.textAlign="center";x.textBaseline="middle";x.fillText("M☻",90,92);l.href=c.toDataURL("image/png")}catch(e){}};im.src=l.href}}catch(e){}
 if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
 render();
 </script>
