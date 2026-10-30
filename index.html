@@ -7,6 +7,11 @@
 <meta name="theme-color" content="#070707">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="Momentum">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -72,7 +77,7 @@ textarea{width:100%;height:90px;background:var(--sf2);color:var(--tx);border:1px
 </head>
 <body>
 <div class="wrap">
-<header><div class="logo">M<b>O</b>MENTUM<small>Daily Mission</small></div>
+<header><div class="logo">M<b>O</b>MENTUM<small id="sub">Daily Mission</small></div>
 <nav role="tablist" aria-label="Sections"><button role="tab" data-a="tab" data-v="today">Today</button><button role="tab" data-a="tab" data-v="prog">Progress</button></nav><button id="who" class="chip" data-a="logout" hidden>Sign out</button></header>
 <main id="app" aria-live="polite"></main>
 <p class="fine">Momentum offers educational fitness guidance, not medical advice, diagnosis or treatment. Stop any exercise that causes sharp, worsening or unusual pain, and check with your doctor before starting a new program.</p>
@@ -243,12 +248,12 @@ const tierOf=(l,e)=>{const n=l.steps.length,p=l.steps.indexOf(e);return["Easy","
 const stepNear=(l,e,c,dir)=>{const av=availOf(l,c),i=l.steps.indexOf(e);return dir>0?av.find(x=>l.steps.indexOf(x)>i):[...av].reverse().find(x=>l.steps.indexOf(x)<i)};
 const PAIN=[["neck","Neck"],["shoulder","Shoulder"],["back","Back"],["hip","Hip"],["knee","Knee"],["ankle","Ankle / foot"],["wrist","Wrist / elbow"]];
 const EQ=[["db","Dumbbells"],["band","Band"],["kb","Kettlebell"],["bench","Bench or box"],["bb","Barbell"],["hex","Hex bar"],["bar","Pull-up bar or rig"]],TIMES=[15,30,45,60];
-const fresh=()=>({days:{},prog:{},lad:{},wt:{},set:{equip:[],time:30,level:"beg",units:"lb"}});
+const fresh=()=>({days:{},prog:{},lad:{},wt:{},owner:null,set:{equip:[],time:30,level:"beg",units:"lb"}});
 function load(){try{const s=JSON.parse(localStorage.getItem(KEY));return s&&s.days?{...fresh(),...s}:fresh()}catch(e){return fresh()}}
 /* ---- Supabase settings: paste yours here (see SETUP steps). The anon key is safe to be public. ---- */
 const SB_URL="https://ynmtqanqdgpogkxvbrel.supabase.co",SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlubXRxYW5xZGdwb2dreHZicmVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMxOTk1NzIsImV4cCI6MjEwODc3NTU3Mn0.msfx5ZQOlDmhy7Ir7WBdcQXnGw4igLjA5pDcV4ktp7A";
-const sb=(window.supabase&&SB_URL.startsWith("https://"))?window.supabase.createClient(SB_URL,SB_KEY):null;
-let S=load(),view="today",F=null,user=null,pt;
+const sb=(window.supabase&&SB_URL.startsWith("https://"))?window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}):null;
+let S=load(),view="today",F=null,user=null,pt,synced=false,authReady=false,otpEmail=null;
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(user){clearTimeout(pt);pt=setTimeout(push,1500)}}
 const key=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 const today=()=>key(new Date());
@@ -362,7 +367,7 @@ function progV(){
  <section class="card"><h3>Points</h3><div class="stats" style="grid-template-columns:repeat(3,1fr)"><div class="stat"><b>${pts.p}</b><span>Points</span></div><div class="stat"><b>${pts.bw}</b><span>Bonus workouts</span></div><div class="stat"><b>${pts.mw+pts.bw}</b><span>All workouts</span></div></div><p class="muted">${PTS_MAIN} points for each daily mission, ${PTS_BONUS} bonus points for each bonus workout.</p></section><section class="card"><h3>How you’ve felt</h3>${feel}</section><section class="card"><h3>Readiness trend</h3>${spark(sc)}</section><section class="card"><h3>Last 28 days</h3><div class="heat">${heat}</div><p class="muted">Green = finished, tinted = checked in.</p></section>
  <section class="card"><h3>Your levels</h3>${lv}</section>${wcard}<section class="card"><h3>Current targets</h3>${pr}</section><section class="card"><h3>Recent workouts</h3>${hist}</section>
  <section class="card"><h3>Backup</h3><p class="muted">Data lives only in this browser. Copy the backup text somewhere safe, or paste one here to restore.</p><textarea id="bk" aria-label="Backup data"></textarea><button class="btn ghost" data-a="bkshow">Show backup</button> <button class="btn ghost" data-a="bkload">Restore</button></section>`}
-function render(){const wb=$("#who");if(wb){wb.hidden=!user;wb.textContent="Sign out";wb.setAttribute("aria-label",user?"Sign out of "+user.email:"Sign out")}
+function render(){const sbt=$("#sub");if(sbt)sbt.textContent=user?"Signed in · "+user.email:"Daily Mission";const wb=$("#who");if(wb){wb.hidden=!user;wb.textContent="Sign out";wb.setAttribute("aria-label",user?"Sign out of "+user.email:"Sign out")}
 document.querySelectorAll("nav button").forEach(b=>{const on=b.dataset.v===view;b.classList.toggle("on",on);b.setAttribute("aria-selected",on)});$("#app").innerHTML=(view==="today"?todayV():progV())+(view==="today"&&user?"":accV())}
 function finish(wi){const k=today(),d=S.days[k],bn=wi!==undefined&&wi!=="",wk=bn?d.bonus[+wi]:d,rpe=+$("#rpe").value,up=[];
  if(!wk.plan.some(p=>wk.log[p.n]&&wk.log[p.n].done)){$("#msg").textContent="Tick off at least one exercise first.";return}
@@ -408,6 +413,8 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b
  else if(a==="units"){S.set.units=b.dataset.v==="kg"?"kg":"lb";save()}
  else if(a==="bcancel"){d.bonus.splice(+b.dataset.w,1);save()}
  else if(a==="login"){login();return}
+ else if(a==="verify"){verify();return}
+ else if(a==="otpback"){otpEmail=null}
  else if(a==="logout"){logout(b);return}
  else if(a==="bkshow"){$("#bk").value=JSON.stringify(S);return}
  else if(a==="bkload"){try{const x=JSON.parse($("#bk").value);if(x&&x.days){S={...fresh(),...x};save()}}catch(err){$("#bk").value="Could not read that backup."}}
@@ -418,14 +425,33 @@ document.addEventListener("input",e=>{const t=e.target,a=t.dataset.a;if(!a)retur
  else if(a==="red"){F.red=t.checked}
  else if(a==="num"){const d=S.days[today()],wk=t.dataset.w?d.bonus[+t.dataset.w]:d,n=wk.plan[+t.dataset.i].n;wk.log[n]=wk.log[n]||{};wk.log[n].a=+t.value;save()}
  else if(a==="wt"){const d=S.days[today()],wk=t.dataset.w?d.bonus[+t.dataset.w]:d,n=wk.plan[+t.dataset.i].n;wk.log[n]=wk.log[n]||{};const v=parseFloat(t.value);if(v>0)wk.log[n].kg=fromU(Math.min(v,2000));else delete wk.log[n].kg;save()}});
-function accV(){if(!sb)return"";return user?`<section class="card"><h3>Account</h3><p class="muted">Signed in as ${user.email}. Your progress syncs across devices.</p><button class="btn ghost" data-a="logout">Sign out</button></section>`:`<section class="card"><h3>Save your progress</h3><p class="muted">Sign in with your email to keep your streak and targets on every device. No password needed.</p><input id="em" type="email" placeholder="you@email.com" autocomplete="email" aria-label="Email" style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--ln);background:var(--sf2);color:var(--tx);margin-bottom:10px"><button class="btn" data-a="login">Email me a sign-in link</button><p id="am" class="muted"></p></section>`}
-async function login(){const em=$("#em").value.trim(),m=$("#am");if(!em){m.textContent="Enter your email first.";return}m.textContent="Sending…";const{error}=await sb.auth.signInWithOtp({email:em,options:{emailRedirectTo:location.origin+location.pathname}});m.textContent=error?error.message:"Check your email for the sign-in link."}
+const esc=t=>String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function accV(){if(!sb||!authReady)return"";
+ if(user)return`<section class="card"><h3>Account</h3><p class="muted">Signed in as ${esc(user.email)}. This device stays signed in until you tap Sign out.</p><button class="btn ghost" data-a="logout">Sign out</button></section>`;
+ const bx='style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--ln);background:var(--sf2);color:var(--tx);margin-bottom:10px"';
+ if(otpEmail)return`<section class="card"><h3>Enter your code</h3><p class="muted">We emailed ${esc(otpEmail)}. Type the code from the email here, or tap the link in it.</p><input id="otp" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="Code from the email" aria-label="Code from the email" ${bx}><button class="btn" data-a="verify">Sign in</button> <button class="btn ghost" data-a="otpback">Use a different email</button><p id="am" class="muted"></p></section>`;
+ return`<section class="card"><h3>Save your progress</h3><p class="muted">Sign in once with your email and this device remembers you. No password needed.</p><input id="em" type="email" placeholder="you@email.com" autocomplete="email" aria-label="Email" ${bx}><button class="btn" data-a="login">Email me a sign-in code</button><p id="am" class="muted"></p></section>`}
+async function login(){const em=$("#em").value.trim(),m=$("#am");if(!em){m.textContent="Enter your email first.";return}m.textContent="Sending…";const{error}=await sb.auth.signInWithOtp({email:em,options:{emailRedirectTo:location.origin+location.pathname}});if(error){m.textContent=error.message;return}otpEmail=em;render()}
+async function verify(){const code=($("#otp").value||"").replace(/\s/g,""),m=$("#am");if(!code){m.textContent="Type the code from the email.";return}m.textContent="Checking…";
+ for(const type of["email","magiclink","signup"]){const r=await sb.auth.verifyOtp({email:otpEmail,token:code,type});if(!r.error){otpEmail=null;return}}
+ m.textContent="That code didn’t work. Check it and try again, or go back and request a new one."}
 function mergeS(a,b){const m={...fresh(),...a,days:{...b.days,...a.days},prog:{...a.prog},lad:{...(b.lad||{}),...(a.lad||{})},wt:mergeWt(a.wt,b.wt)};for(const k in b.days){const x=a.days[k],y=b.days[k];if(x&&y&&((y.fin&&!x.fin)||bonusDone(y).length>bonusDone(x).length))m.days[k]=y}for(const n in(b.prog||{})){if(!m.prog[n]||b.prog[n].t>m.prog[n].t)m.prog[n]=b.prog[n]}for(const id in(b.lad||{})){const L=LADS.find(x=>x.id===id),ai=L?L.steps.findIndex(e=>e.name===(a.lad||{})[id]):-1,bi=L?L.steps.findIndex(e=>e.name===b.lad[id]):-1;if(bi>ai)m.lad[id]=b.lad[id]}return m}
-async function pull(){if(!sb||!user)return;try{const{data}=await sb.from("progress").select("data").eq("user_id",user.id).maybeSingle();if(data&&data.data&&data.data.days)S=mergeS(S,data.data);try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}await push()}catch(e){}render()}
-async function push(){if(!sb||!user)return false;try{const r=await sb.from("progress").upsert({user_id:user.id,data:S,updated_at:new Date().toISOString()});return!(r&&r.error)}catch(e){return false}}
+async function pull(){if(!sb||!user)return;const uid=user.id;let ok=false;try{
+ const r=await sb.from("progress").select("data").eq("user_id",uid).maybeSingle();if(r.error)throw r.error;if(!user||user.id!==uid)return;
+ const cloud=r.data&&r.data.data&&r.data.data.days?r.data.data:null;
+ if(S.owner&&S.owner!==uid)S=cloud?{...fresh(),...cloud}:fresh();else if(cloud)S=mergeS(S,cloud);
+ S.owner=uid;synced=true;ok=true;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}await push()
+ }catch(e){if(user&&user.id===uid&&S.owner&&S.owner!==uid){S=fresh();try{localStorage.removeItem(KEY)}catch(x){}}}
+ render()}
+async function push(){if(!sb||!user)return false;if(!synced){await pull();return synced}try{const r=await sb.from("progress").upsert({user_id:user.id,data:S,updated_at:new Date().toISOString()});return!(r&&r.error)}catch(e){return false}}
 async function logout(b){if(!sb)return;clearTimeout(pt);if(b)b.textContent="Saving…";const ok=await push();if(!ok){if(b)b.textContent="Couldn’t save. Try again";return}
  S=fresh();try{localStorage.removeItem(KEY)}catch(e){}try{await sb.auth.signOut()}catch(e){}user=null;view="today";F=null;render()}
-if(sb){sb.auth.onAuthStateChange((ev,sess)=>{user=sess?sess.user:null;if(user)setTimeout(pull,0);else render()})}
+if(sb){sb.auth.onAuthStateChange((ev,sess)=>{authReady=true;const nu=sess?sess.user:null,changed=!!nu&&(!user||user.id!==nu.id);user=nu;
+ if(!user){synced=false;render();return}
+ try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
+ if(changed||!synced){if(changed)synced=false;setTimeout(pull,0)}});
+ setTimeout(()=>{if(!authReady){authReady=true;render()}},2500)}
+try{const l=document.querySelector('link[rel="apple-touch-icon"]');if(l){const im=new Image();im.onerror=()=>{try{const c=document.createElement("canvas");c.width=c.height=180;const x=c.getContext("2d");x.fillStyle="#070707";x.fillRect(0,0,180,180);x.fillStyle="#ff2a34";x.beginPath();x.arc(90,90,65,0,7);x.fill();x.fillStyle="#fff";x.font="bold 76px Arial,Helvetica,sans-serif";x.textAlign="center";x.textBaseline="middle";x.fillText("M",90,94);l.href=c.toDataURL("image/png")}catch(e){}};im.src=l.href}}catch(e){}
 if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
 render();
 </script>
