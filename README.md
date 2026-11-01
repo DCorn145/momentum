@@ -1,4 +1,4 @@
-# Momentum
+# Mobentum
 
 A free, single-file daily workout app. Each day you do a 30-second check-in (sleep, energy, stress, pain areas, time, equipment) and Momentum builds a fresh mission around it, then tracks your progress over time.
 
