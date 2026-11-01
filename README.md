@@ -1,6 +1,6 @@
-# Mobentum
+# M☺︎BENTUM
 
-A free, single-file daily workout app. Each day you do a 30-second check-in (sleep, energy, stress, pain areas, time, equipment) and Momentum builds a fresh mission around it, then tracks your progress over time.
+A free, single-file daily workout app. Each day you do a 30-second check-in (sleep, energy, stress, pain areas, time, equipment) and M☺︎BENTUM builds a fresh mission around it, then tracks your progress over time.
 
 ## Features
 
@@ -25,17 +25,33 @@ No build step. Open `index.html` in a browser.
 
 ## Customize
 
-- **Exercises**: edit the `D` array in `index.html`. Each line is `name|pattern|equipment|joints loaded|unit|cue`.
-  - Patterns: `mob`, `squat`, `hinge`, `push`, `pull`, `core`
-  - Equipment: `bw`, `db`, `band`, `kb`
-  - Joints: `neck`, `shoulder`, `back`, `hip`, `knee`, `ankle`, `wrist`
-  - Units: `r` (reps), `s` (seconds), `m` (slow mobility reps)
-- **Progression**: see the `finish()` function. Targets rise by 1 rep (or 5 sec) when hit at effort 8/10 or below.
-- **Readiness formula**: see `readiness()`.
+### Add or reorder exercises
+Open `index.html` on GitHub, press the pencil icon, and search for `EXERCISE LIBRARY`. Each exercise is one line:
+
+    Name | equipment | joints it loads | unit | coaching cue | rep range (optional) | load (optional)
+
+- **Ladders** list exercises from easiest (top) to hardest (bottom). Put a new line where it belongs.
+- Equipment codes: `bw db band kb bench bb hex bar`. A comma means either one (`db,kb`), a plus means both (`db+bench`).
+- Joints: `neck shoulder back hip knee ankle wrist`. People with pain there are not given the move.
+- Units: `r` reps, `rs` reps each side, `s` seconds, `ss` seconds each side, `m` slow mobility reps.
+- `load` / `noload` forces a weight box on or off. If left off, moves needing `db`, `kb`, `bb` or `hex` get one automatically.
+- A line starting with `#` starts a new group: `# id | pattern | Title | ladder`.
+
+### Weight tracking
+- Loaded exercises get a weight box. The app estimates a one-rep max from each logged set (weight divided by the percentage for the reps done: 1 rep 100%, 3 reps 93%, 5 reps 85%, 7 reps 77%, 10 reps 67%, 12 reps 62%, 15 reps 58%, 20 reps 50%, straight lines in between) and suggests a weight for the target reps next time.
+- To change the percentages, search for `PCT=` in `index.html`.
+
+### How progression works
+- Each ladder remembers the person's current step. New users pick Beginner, Intermediate or Advanced once.
+- Hit the target at effort 8/10 or lower and the target rises by 1 rep (5 sec for holds) until the top of the range.
+- At the top of the range, with reps logged, the person moves up one step and the target resets.
+- Effort 9-10 while missing the target lowers the target, then steps back down the ladder.
+- Low-readiness days run one step easier and hold targets. After 10+ days away, targets drop slightly.
+- Moves the person has no equipment for, or that load a painful joint, are skipped automatically.
 
 ## Disclaimer
 
-Momentum provides educational fitness guidance only. It is not medical advice, diagnosis or treatment. Stop any exercise that causes sharp, worsening or unusual pain, and consult a doctor before starting a new program.
+M☺︎BENTUM provides educational fitness guidance only. It is not medical advice, diagnosis or treatment. Stop any exercise that causes sharp, worsening or unusual pain, and consult a doctor before starting a new program.
 
 ## License
 
