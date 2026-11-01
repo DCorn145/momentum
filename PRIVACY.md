@@ -1,4 +1,4 @@
-# Momentum Privacy Policy (template, review before publishing)
+# MOBENTUM Privacy Policy (template, review before publishing)
 
 **What we collect:** your email address (for sign-in) and your workout data: daily check-in answers (sleep, energy, stress, pain areas, time, equipment), completed workouts, efforts and targets.
 
