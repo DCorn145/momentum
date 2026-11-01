@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Momentum — Daily Mission</title>
+<title>MOBENTUM — Daily Mission</title>
 <meta name="theme-color" content="#070707">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<meta name="apple-mobile-web-app-title" content="Momentum">
+<meta name="apple-mobile-web-app-title" content="MOBENTUM">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -81,10 +81,10 @@ textarea{width:100%;height:90px;background:var(--sf2);color:var(--tx);border:1px
 </head>
 <body>
 <div class="wrap">
-<header><div class="logo"><span role="img" aria-label="Momentum">M<b>☻</b>MENTUM</span><small id="sub">Daily Mission</small></div>
+<header><div class="logo"><span role="img" aria-label="MOBENTUM">M<b>☻</b>BENTUM</span><small id="sub">Daily Mission</small></div>
 <nav role="tablist" aria-label="Sections"><button role="tab" data-a="tab" data-v="today">Today</button><button role="tab" data-a="tab" data-v="prog">Progress</button></nav><button id="who" class="chip" data-a="logout" hidden>Sign out</button></header>
 <main id="app" aria-live="polite"></main>
-<p class="fine">Momentum offers educational fitness guidance, not medical advice, diagnosis or treatment. Stop any exercise that causes sharp, worsening or unusual pain, and check with your doctor before starting a new program.</p>
+<p class="fine">MOBENTUM offers educational fitness guidance, not medical advice, diagnosis or treatment. Stop any exercise that causes sharp, worsening or unusual pain, and check with your doctor before starting a new program.</p>
 </div>
 <div id="qm" class="vm" hidden data-a="qclose"><div class="vc" role="dialog" aria-modal="true" aria-label="Quote"><p class="muted" style="margin:0 0 6px;letter-spacing:2px;font-size:12px">MINDSET</p><p id="qtx" class="qt"></p><p id="qau" class="qa"></p><button class="btn" data-a="qclose" style="margin-top:16px;width:100%">Keep going</button></div></div>
 <div id="vm" class="vm" hidden data-a="vback"><div class="vc" role="dialog" aria-modal="true" aria-labelledby="vt"><button class="vx" data-a="vclose" aria-label="Close video">✕</button><h3 id="vt"></h3><div id="vb"></div><p id="vq" class="muted"></p></div></div>
@@ -311,7 +311,7 @@ function formV(){if(!F)initF();
  const nav=(ok,last)=>`<div class="acts">${st>1?`<button class="btn ghost" data-a="back">Back</button>`:"<span></span>"}${last?`<button class="btn ${ok?"":"off"}" data-a="go">Build today’s mission</button>`:`<button class="btn ${ok?"":"off"}" data-a="next">Next</button>`}</div>`;
  let b="";
  if(st===1)b=hd("How did you sleep?","Choose the number that best fits last night’s sleep.")+scale("sleep",["Rough","Poor","Okay","Good","Elite"])+nav(F.sleep!=null);
- else if(st===2)b=hd("How is your energy?","Be honest. Momentum works better when the input is real.")+scale("energy",["Empty","Low","Steady","High","Locked in"])+nav(F.energy!=null);
+ else if(st===2)b=hd("How is your energy?","Be honest. MOBENTUM works better when the input is real.")+scale("energy",["Empty","Low","Steady","High","Locked in"])+nav(F.energy!=null);
  else if(st===3)b=hd("How stressed are you?","Higher stress lowers today’s recommended intensity.")+scale("stress",["Calm","Light","Moderate","High","Maxed"])+nav(F.stress!=null);
  else if(st===4)b=hd("Any pain or restriction?","Pick every area that hurts or feels restricted. Moves that load those areas are left out.")+`<div class="chips">${PAIN.map(([v,l])=>chip("pain",v,l,F.pain.includes(v))).join("")}${chip("pain","none","No pain today",F.pain.length===0)}</div>`+nav(true);
  else b=hd("Time and equipment","Pick what you have. Bodyweight moves are always included.")+`<h3>Time</h3><div class="chips">${TIMES.map(t=>chip("time",t,t+" min",F.time===t)).join("")}</div>
@@ -350,7 +350,7 @@ function todayV(){const k=today(),d=S.days[k];
  if(d.ck.red)return`<section class="card"><h2>Rest today</h2><p>You flagged a symptom that deserves attention. Skip training today, and have it checked by a qualified professional if it continues.</p><button class="btn ghost" data-a="edit">Edit check-in</button></section>`;
  if(d.fin){(d.bonus||[]).forEach((w,j)=>{if(!w.fin&&w.plan.some(p=>!ex(p.n))){w.plan=build(k,d.ck,"b"+j+"-"+(w.salt||0),{focus:w.focus,time:w.time,bonus:true});w.log={}}});const j=(d.bonus||[]).findIndex(b=>!b.fin);if(j>=0)return bonusV(d,j);if(BF)return bonusPickV()}
  return missionV(d,k)}
-const QUOTES=[["The impediment to action advances action. What stands in the way becomes the way.", "Marcus Aurelius"], ["You have power over your mind, not outside events. Realize this, and you will find strength.", "Marcus Aurelius"], ["If it is endurable, endure it. Stop complaining.", "Marcus Aurelius"], ["Waste no more time arguing what a good person should be. Be one.", "Marcus Aurelius"], ["Do what you have to do, and do it well.", "Marcus Aurelius"], ["It is not because things are difficult that we do not dare; it is because we do not dare that they are difficult.", "Seneca"], ["We suffer more often in imagination than in reality.", "Seneca"], ["Luck is what happens when preparation meets opportunity.", "Seneca"], ["Difficulties strengthen the mind, as labor does the body.", "Seneca"], ["While we are postponing, life speeds by.", "Seneca"], ["No man is free who is not master of himself.", "Epictetus"], ["First say to yourself what you would be; then do what you have to do.", "Epictetus"], ["It's not what happens to you, but how you react to it that matters.", "Epictetus"], ["Wealth consists not in having great possessions, but in having few wants.", "Epictetus"], ["No person has the power to have everything they want, but it is in their power not to want what they don't have.", "Epictetus"], ["The best revenge is not to be like your enemy.", "Marcus Aurelius"], ["Small steps, repeated daily, build the person you are becoming.", "Momentum"], ["You do not rise to the level of your goals. You fall to the level of your habits.", "James Clear"], ["The body achieves what the mind believes.", "Napoleon Hill"], ["Discipline is choosing between what you want now and what you want most.", "Abraham Lincoln (attributed)"], ["A river cuts through rock not because of its power, but because of its persistence.", "Jim Watkins"], ["Today's effort is tomorrow's strength.", "Momentum"], ["Show up. Do the work. Let the results follow.", "Momentum"], ["Strength does not come from winning. Your struggles develop your strengths.", "Arnold Schwarzenegger"]];
+const QUOTES=[["The impediment to action advances action. What stands in the way becomes the way.", "Marcus Aurelius"], ["You have power over your mind, not outside events. Realize this, and you will find strength.", "Marcus Aurelius"], ["If it is endurable, endure it. Stop complaining.", "Marcus Aurelius"], ["Waste no more time arguing what a good person should be. Be one.", "Marcus Aurelius"], ["Do what you have to do, and do it well.", "Marcus Aurelius"], ["It is not because things are difficult that we do not dare; it is because we do not dare that they are difficult.", "Seneca"], ["We suffer more often in imagination than in reality.", "Seneca"], ["Luck is what happens when preparation meets opportunity.", "Seneca"], ["Difficulties strengthen the mind, as labor does the body.", "Seneca"], ["While we are postponing, life speeds by.", "Seneca"], ["No man is free who is not master of himself.", "Epictetus"], ["First say to yourself what you would be; then do what you have to do.", "Epictetus"], ["It's not what happens to you, but how you react to it that matters.", "Epictetus"], ["Wealth consists not in having great possessions, but in having few wants.", "Epictetus"], ["No person has the power to have everything they want, but it is in their power not to want what they don't have.", "Epictetus"], ["The best revenge is not to be like your enemy.", "Marcus Aurelius"], ["Small steps, repeated daily, build the person you are becoming.", "MOBENTUM"], ["You do not rise to the level of your goals. You fall to the level of your habits.", "James Clear"], ["The body achieves what the mind believes.", "Napoleon Hill"], ["Discipline is choosing between what you want now and what you want most.", "Abraham Lincoln (attributed)"], ["A river cuts through rock not because of its power, but because of its persistence.", "Jim Watkins"], ["Today's effort is tomorrow's strength.", "MOBENTUM"], ["Show up. Do the work. Let the results follow.", "MOBENTUM"], ["Strength does not come from winning. Your struggles develop your strengths.", "Arnold Schwarzenegger"]];
 let popQ=null,progSeen=false;
 function pickQuote(seed){let h=0;const t=String(seed);for(let i=0;i<t.length;i++)h=(h*31+t.charCodeAt(i))>>>0;return QUOTES[h%QUOTES.length]}
 function quoteCard(seed){const q=pickQuote(seed);return`<section class="card qcard"><p class="qt">“${q[0]}”</p><p class="qa">${q[1]}</p></section>`}
@@ -363,11 +363,11 @@ let instEv=null;addEventListener("beforeinstallprompt",e=>{e.preventDefault();in
 function instGone(){try{return localStorage.getItem("momentum.inst")==="1"}catch(e){return false}}
 function installTip(){if(STANDALONE||instGone())return"";
  let body;
- if(INAPP)body=`<p class="muted">You're in an in-app browser. Tap the menu (⋯ or Share) and choose <b>Open in Safari</b> or <b>Open in browser</b>, then add Momentum to your home screen.</p>`;
+ if(INAPP)body=`<p class="muted">You're in an in-app browser. Tap the menu (⋯ or Share) and choose <b>Open in Safari</b> or <b>Open in browser</b>, then add MOBENTUM to your home screen.</p>`;
  else if(ISIOS)body=`<p class="muted">Tap the <b>Share</b> button (square with an arrow) in Safari, scroll down, then tap <b>Add to Home Screen</b> and <b>Add</b>. Open it from there each day.</p>`;
  else if(instEv)body=`<p class="muted">Get one-tap access from your home screen.</p><button class="btn" data-a="doinst">Install app</button>`;
  else body=`<p class="muted">Open your browser menu and choose <b>Install app</b> or <b>Add to Home screen</b> for one-tap access.</p>`;
- return`<section class="card inst"><div><h3>Add Momentum to your home screen</h3>${body}</div><button class="x" data-a="instx" aria-label="Dismiss">✕</button></section>`}
+ return`<section class="card inst"><div><h3>Add MOBENTUM to your home screen</h3>${body}</div><button class="x" data-a="instx" aria-label="Dismiss">✕</button></section>`}
 function streak(){let n=0,d=new Date();if(!(S.days[key(d)]||{}).fin)d.setDate(d.getDate()-1);while((S.days[key(d)]||{}).fin){n++;d.setDate(d.getDate()-1)}return n}
 function spark(a){if(a.length<2)return`<p class="muted">Two check-ins unlock your readiness trend.</p>`;const w=300,h=70,pts=a.map((v,i)=>`${(i/(a.length-1)*w).toFixed(1)},${(h-4-v/100*(h-8)).toFixed(1)}`).join(" ");return`<svg viewBox="0 0 ${w} ${h}" class="spark" role="img" aria-label="Readiness trend"><polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/></svg>`}
 function lines(sets){const w=300,h=80,n=Math.max(...sets.map(x=>x.v.length));if(n<2)return`<p class="muted">Two check-ins unlock your trend.</p>`;const sx=i=>(i/(n-1)*w).toFixed(1),sy=v=>(h-4-(v-1)/9*(h-8)).toFixed(1);
