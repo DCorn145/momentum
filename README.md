@@ -10,7 +10,7 @@ A free, single-file daily workout app. Each day you do a 30-second check-in (sle
 - **Time-based planning**: the plan is built to fit your available minutes.
 - **Explainable**: each mission shows why it looks the way it does.
 - **Progress tracking**: streak, weekly count, readiness trend, 28-day grid, recent workouts, and automatic target progression.
-- **Private**: no accounts, no server, no tracking. Data is stored in your browser's localStorage, with a copy/paste backup on the Progress tab.
+- **Private**: no ads, no tracking. Works without an account (data stays in your browser's localStorage). If you sign in with your email, progress is also synced to your account in Supabase. Copy/paste backup on the Progress tab, and a Delete my account button. See `privacy.html` and `terms.html`.
 
 ## Run it
 
@@ -43,9 +43,9 @@ Open `index.html` on GitHub, press the pencil icon, and search for `EXERCISE LIB
 
 ### How progression works
 - Each ladder remembers the person's current step. New users pick Beginner, Intermediate or Advanced once.
-- Hit the target at effort 8/10 or lower and the target rises by 1 rep (5 sec for holds) until the top of the range.
+- After each workout the person rates how good they feel (1 rough, 10 great). Hit the target and feel 3/10 or better and the target rises by 1 rep (5 sec for holds) until the top of the range.
 - At the top of the range, with reps logged, the person moves up one step and the target resets.
-- Effort 9-10 while missing the target lowers the target, then steps back down the ladder.
+- Feeling 1-2/10 while missing the target lowers the target, then steps back down the ladder.
 - Low-readiness days run one step easier and hold targets. After 10+ days away, targets drop slightly.
 - Moves the person has no equipment for, or that load a painful joint, are skipped automatically.
 
@@ -55,4 +55,4 @@ M☺︎BENTUM provides educational fitness guidance only. It is not medical advi
 
 ## License
 
-MIT, see `LICENSE`.
+All rights reserved, see `LICENSE`.

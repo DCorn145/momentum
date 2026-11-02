@@ -80,6 +80,18 @@ textarea{width:100%;height:90px;background:var(--sf2);color:var(--tx);border:1px
 .up{color:var(--ok);font-weight:600}
 @media(max-width:480px){.ex{grid-template-columns:40px 1fr}.exr{grid-column:2}.stats{grid-template-columns:repeat(2,1fr)}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+
+:root{--rb:#d90b16}
+nav button.on,.chip[aria-pressed=true],.sc button[aria-pressed=true],.btn{background:var(--rb)}
+.btn.ghost{background:var(--sf2)}
+.on .tick{background:#0b7a4d;border-color:#0b7a4d}
+.up{color:#0b7a4d}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .up{color:var(--ok)}}
+:root[data-theme="dark"] .up{color:var(--ok)}
+.tick,.exr button,.vx{width:44px;height:44px}
+.chip,nav button,.hb,.btn,.inst .x{min-height:44px}.inst .x{min-width:44px}
+.exr input{min-height:44px}.nm{padding:8px 0}
+.fine a{color:inherit;display:inline-block;padding:12px 8px;font-weight:600}
 </style>
 </head>
 <body>
@@ -87,7 +99,7 @@ textarea{width:100%;height:90px;background:var(--sf2);color:var(--tx);border:1px
 <header><div class="logo"><span role="img" aria-label="MOBENTUM">M<b>☺︎</b>BENTUM</span><small id="sub">Daily Mission</small></div>
 <nav role="tablist" aria-label="Sections"><button role="tab" data-a="tab" data-v="today">Today</button><button role="tab" data-a="tab" data-v="prog">Progress</button></nav><button id="who" class="chip" data-a="logout" hidden>Sign out</button></header>
 <main id="app" aria-live="polite"></main>
-<p class="fine">M☺︎BENTUM offers educational fitness guidance, not medical advice, diagnosis or treatment. Stop any exercise that causes sharp, worsening or unusual pain, and check with your doctor before starting a new program.</p>
+<p class="fine">M☺︎BENTUM offers educational fitness guidance, not medical advice, diagnosis or treatment. Stop any exercise that causes sharp, worsening or unusual pain, and check with your doctor before starting a new program.<br><a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms</a></p>
 </div>
 <div id="qm" class="vm" hidden data-a="qclose"><div class="vc" role="dialog" aria-modal="true" aria-label="Quote"><p class="muted" style="margin:0 0 6px;letter-spacing:2px;font-size:12px">MINDSET</p><p id="qtx" class="qt"></p><p id="qau" class="qa"></p><button class="btn" data-a="qclose" style="margin-top:16px;width:100%">Keep going</button></div></div>
 <div id="tm" class="vm" hidden data-a="tmback"><div class="vc" role="dialog" aria-modal="true" aria-labelledby="tmt"><button class="vx" data-a="tmclose" aria-label="Close timer">✕</button><h3 id="tmt">Timer</h3><div id="tmset"></div><div class="tmd"><div id="tmph" class="muted"></div><div id="tmbig">0:00</div></div><div class="acts"><button class="btn" id="tmgo" data-a="tmgo">Start</button><button class="btn ghost" data-a="tmreset">Reset</button></div><p class="muted" style="font-size:12px;margin-bottom:0">Keep this screen open. The timer pauses if your phone locks or the app goes to the background.</p></div></div>
@@ -259,11 +271,18 @@ const stepNear=(l,e,c,dir)=>{const av=availOf(l,c),i=l.steps.indexOf(e);return d
 const PAIN=[["neck","Neck"],["shoulder","Shoulder"],["back","Back"],["hip","Hip"],["knee","Knee"],["ankle","Ankle / foot"],["wrist","Wrist / elbow"]];
 const EQ=[["db","Dumbbells"],["band","Band"],["kb","Kettlebell"],["bench","Bench or box"],["bb","Barbell"],["hex","Hex bar"],["bar","Pull-up bar or rig"]],TIMES=[15,30,45,60];
 const fresh=()=>({days:{},prog:{},lad:{},wt:{},owner:null,set:{equip:[],time:30,level:"beg",units:"lb"}});
-function load(){try{const s=JSON.parse(localStorage.getItem(KEY));return s&&s.days?{...fresh(),...s}:fresh()}catch(e){return fresh()}}
+const DKEY=/^\d{4}-\d{2}-\d{2}$/,BADC=/[<>"`]/g;
+function scrub(v,d){if(d>9)return null;if(typeof v==="string")return v.slice(0,400).replace(BADC,"");if(typeof v==="number")return isFinite(v)?v:0;if(typeof v==="boolean"||v===null)return v;if(Array.isArray(v))return v.slice(0,500).map(i=>scrub(i,d+1));if(typeof v==="object"){const o={};let n=0;for(const k of Object.keys(v)){if(k==="__proto__"||k==="constructor"||k==="prototype"||++n>3000)continue;o[k.replace(BADC,"")]=scrub(v[k],d+1)}return o}return null}
+function clean(x){try{if(!x||typeof x!=="object"||Array.isArray(x)||!x.days||typeof x.days!=="object"||Array.isArray(x.days))return null;if(JSON.stringify(x).length>1500000)return null;const o=scrub(x,0),f=fresh();for(const k of Object.keys(o.days))if(!DKEY.test(k)||!o.days[k]||typeof o.days[k]!=="object")delete o.days[k];
+ for(const k of["prog","lad","wt"])if(!o[k]||typeof o[k]!=="object"||Array.isArray(o[k]))o[k]={};
+ const t=o.set&&typeof o.set==="object"&&!Array.isArray(o.set)?o.set:{},ids=EQ.map(e=>e[0]);o.set={...f.set,...t};o.set.units=o.set.units==="kg"?"kg":"lb";o.set.time=TIMES.includes(+o.set.time)?+o.set.time:30;o.set.equip=Array.isArray(o.set.equip)?o.set.equip.filter(q=>ids.includes(q)):[];
+ if(o.owner!=null&&typeof o.owner!=="string")o.owner=null;return o}catch(e){return null}}
+function trimS(){let js=JSON.stringify(S);if(js.length<=900000)return;const ks=Object.keys(S.days).sort();while(ks.length>30&&js.length>900000){delete S.days[ks.shift()];js=JSON.stringify(S)}}
+function load(){try{const s=clean(JSON.parse(localStorage.getItem(KEY)));return s?{...fresh(),...s}:fresh()}catch(e){return fresh()}}
 /* ---- Supabase settings: paste yours here (see SETUP steps). The anon key is safe to be public. ---- */
 const SB_URL="https://ynmtqanqdgpogkxvbrel.supabase.co",SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlubXRxYW5xZGdwb2dreHZicmVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMxOTk1NzIsImV4cCI6MjEwODc3NTU3Mn0.msfx5ZQOlDmhy7Ir7WBdcQXnGw4igLjA5pDcV4ktp7A";
 let sb=null;
-let S=load(),view="today",F=null,user=null,pt,synced=false,authReady=false,otpEmail=null;
+let delAsk=false,delDone=false;let S=load(),view="today",F=null,user=null,pt,synced=false,authReady=false,otpEmail=null;
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(user){clearTimeout(pt);pt=setTimeout(push,1500)}}
 const key=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 const today=()=>key(new Date());
@@ -459,7 +478,7 @@ function progV(){
  return quoteCard(today()+"p"+fin.length)+`<section class="card"><div class="stats"><div class="stat"><b>${streak()}</b><span>Day streak</span></div><div class="stat"><b>${wk}</b><span>This week</span></div><div class="stat"><b>${fin.length}</b><span>Total</span></div><div class="stat"><b>${avg}</b><span>Avg ready</span></div></div></section>
  <section class="card"><h3>Points</h3><div class="stats" style="grid-template-columns:repeat(3,1fr)"><div class="stat"><b>${pts.p}</b><span>Points</span></div><div class="stat"><b>${pts.bw}</b><span>Bonus workouts</span></div><div class="stat"><b>${pts.mw+pts.bw}</b><span>All workouts</span></div></div><p class="muted">${PTS_MAIN} points for each daily mission, ${PTS_BONUS} bonus points for each bonus workout.</p></section><section class="card"><h3>How you’ve felt</h3>${feel}</section><section class="card"><h3>Readiness trend</h3>${spark(sc)}</section><section class="card"><h3>Last 28 days</h3><div class="heat">${heat}</div><p class="muted">Green = finished, tinted = checked in.</p></section>
  <section class="card"><h3>Your levels</h3>${lv}</section>${wcard}<section class="card"><h3>3RM recommendations</h3><p class="muted">93% of your estimated one-rep max: a heavy set of 3 reps. Rounded to the nearest ${isKg()?"2.5 kg":"5 lb"}. Warm up first and use a spotter.</p>${pr}</section><section class="card"><h3>Recent workouts</h3><p class="muted">Tap a day to see what you did.</p>${hist}</section>
- <section class="card"><h3>Backup</h3><p class="muted">Data lives only in this browser. Copy the backup text somewhere safe, or paste one here to restore.</p><textarea id="bk" aria-label="Backup data"></textarea><button class="btn ghost" data-a="bkshow">Show backup</button> <button class="btn ghost" data-a="bkload">Restore</button></section>`}
+ <section class="card"><h3>Backup</h3><p class="muted">Your data is saved in this browser, and also synced to your account if you sign in. Copy the backup text somewhere safe, or paste one here to restore it (restoring replaces what is on this device).</p><textarea id="bk" aria-label="Backup data"></textarea><button class="btn ghost" data-a="bkshow">Show backup</button> <button class="btn ghost" data-a="bkload">Restore</button></section>`}
 function render(){const sbt=$("#sub");if(sbt)sbt.textContent=user?"Signed in · "+user.email:"Daily Mission";const wb=$("#who");if(wb){wb.hidden=!(user||!sb||authReady);wb.className=user?"chip":"btn hb";wb.textContent=user?"Sign out":"Sign in";wb.setAttribute("data-a",user?"logout":"gosign");wb.setAttribute("aria-label",user?"Sign out of "+user.email:"Sign in")}
 document.querySelectorAll("nav button").forEach(b=>{const on=b.dataset.v===view;b.classList.toggle("on",on);b.setAttribute("aria-selected",on)});$("#app").innerHTML=(view==="today"?installTip():"")+(view==="signin"?signinV():view==="today"?todayV():progV())+(view==="signin"||(view==="today"&&user)?"":accV())}
 function finish(wi){const k=today(),d=S.days[k],bn=wi!==undefined&&wi!=="",wk=bn?d.bonus[+wi]:d,feel=Math.min(10,Math.max(1,+$("#rpe").value||6)),rpe=11-feel,up=[];
@@ -523,9 +542,9 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b
  else if(a==="verify"){verify();return}
  else if(a==="otpback"){otpEmail=null}
  else if(a==="gosign"){view="signin";try{scrollTo(0,0)}catch(e){}}
- else if(a==="logout"){logout(b);return}
+ else if(a==="delask"){delAsk=true;delDone=false;render();return}else if(a==="delno"){delAsk=false;render();return}else if(a==="delgo"){delAcct(b);return}else if(a==="logout"){logout(b);return}
  else if(a==="bkshow"){$("#bk").value=JSON.stringify(S);return}
- else if(a==="bkload"){try{const x=JSON.parse($("#bk").value);if(x&&x.days){S={...fresh(),...x};save()}}catch(err){$("#bk").value="Could not read that backup."}}
+ else if(a==="bkload"){try{const x=clean(JSON.parse($("#bk").value));if(x){S={...fresh(),...x};save()}else{$("#bk").value="Could not read that backup.";return}}catch(err){$("#bk").value="Could not read that backup.";return}}
  render()});
 document.addEventListener("input",e=>{const t=e.target,a=t.dataset.a;if(!a)return;
  if(a==="rng"){F[t.dataset.k]=+t.value;$("#v-"+t.dataset.k).textContent=t.value}
@@ -539,10 +558,11 @@ function signinV(){const hd=`<section class="card"><h2>Sign in</h2><p class="mut
  return hd+accV()+bk}
 const esc=t=>String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function accV(){if(!sb||!authReady)return"";
- if(user)return`<section class="card"><h3>Account</h3><p class="muted">Signed in as ${esc(user.email)}. This device stays signed in until you tap Sign out.</p><button class="btn ghost" data-a="logout">Sign out</button></section>`;
+ const dd=delDone&&!user?`<section class="card"><p class="up" style="margin:0">Your account and cloud data were deleted.</p></section>`:"";
+ if(user)return`<section class="card"><h3>Account</h3><p class="muted">Signed in as ${esc(user.email)}. This device stays signed in until you tap Sign out.</p><button class="btn ghost" data-a="logout">Sign out</button></section>`+(delAsk?`<section class="card"><h3>Delete my account</h3><p class="muted">This permanently deletes your sign-in and all workout data stored in the cloud, and clears this device. It cannot be undone. Type DELETE to confirm.</p><input id="delc" type="text" autocomplete="off" autocapitalize="characters" aria-label="Type DELETE to confirm" style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--ln);background:var(--sf2);color:var(--tx);margin-bottom:10px"><button class="btn" data-a="delgo">Delete everything</button> <button class="btn ghost" data-a="delno">Cancel</button><p id="am" class="muted"></p></section>`:`<section class="card"><p class="muted" style="margin:0 0 8px">Want to leave? You can erase your account and cloud data.</p><button class="btn ghost" data-a="delask">Delete my account</button></section>`);
  const bx='style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--ln);background:var(--sf2);color:var(--tx);margin-bottom:10px"';
  if(otpEmail)return`<section class="card"><h3>Enter your code</h3><p class="muted">We emailed ${esc(otpEmail)}. Type the code from the email here, or tap the link in it.</p><input id="otp" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="Code from the email" aria-label="Code from the email" ${bx}><button class="btn" data-a="verify">Sign in</button> <button class="btn ghost" data-a="otpback">Use a different email</button><p id="am" class="muted"></p></section>`;
- return`<section class="card"><h3>Save your progress</h3><p class="muted">Sign in once with your email and this device remembers you. No password needed.</p><input id="em" type="email" placeholder="you@email.com" autocomplete="email" aria-label="Email" ${bx}><button class="btn" data-a="login">Email me a sign-in code</button><p id="am" class="muted"></p></section>`}
+ return dd+`<section class="card"><h3>Save your progress</h3><p class="muted">Sign in once with your email and this device remembers you. No password needed.</p><input id="em" type="email" placeholder="you@email.com" autocomplete="email" aria-label="Email" ${bx}><button class="btn" data-a="login">Email me a sign-in code</button><p id="am" class="muted"></p><p class="muted">By signing in you agree to the <a href="terms.html">Terms</a> and <a href="privacy.html">Privacy Policy</a>. You must be 18 or older.</p></section>`}
 async function login(){const em=$("#em").value.trim(),m=$("#am");if(!em){m.textContent="Enter your email first.";return}m.textContent="Sending…";const{error}=await sb.auth.signInWithOtp({email:em,options:{emailRedirectTo:location.origin+location.pathname}});if(error){m.textContent=error.message;return}otpEmail=em;render()}
 async function verify(){const code=($("#otp").value||"").replace(/\s/g,""),m=$("#am");if(!code){m.textContent="Type the code from the email.";return}m.textContent="Checking…";
  for(const type of["email","magiclink","signup"]){const r=await sb.auth.verifyOtp({email:otpEmail,token:code,type});if(!r.error){otpEmail=null;return}}
@@ -550,12 +570,16 @@ async function verify(){const code=($("#otp").value||"").replace(/\s/g,""),m=$("
 function mergeS(a,b){const m={...fresh(),...a,days:{...b.days,...a.days},prog:{...a.prog},lad:{...(b.lad||{}),...(a.lad||{})},wt:mergeWt(a.wt,b.wt)};for(const k in b.days){const x=a.days[k],y=b.days[k];if(x&&y&&((y.fin&&!x.fin)||bonusDone(y).length>bonusDone(x).length))m.days[k]=y}for(const n in(b.prog||{})){if(!m.prog[n]||b.prog[n].t>m.prog[n].t)m.prog[n]=b.prog[n]}for(const id in(b.lad||{})){const L=LADS.find(x=>x.id===id),ai=L?L.steps.findIndex(e=>e.name===(a.lad||{})[id]):-1,bi=L?L.steps.findIndex(e=>e.name===b.lad[id]):-1;if(bi>ai)m.lad[id]=b.lad[id]}return m}
 async function pull(quiet){if(!sb||!user)return;const uid=user.id,before=quiet?JSON.stringify(S):null;let ok=false;try{
  const r=await sb.from("progress").select("data").eq("user_id",uid).maybeSingle();if(r.error)throw r.error;if(!user||user.id!==uid)return;
- const cloud=r.data&&r.data.data&&r.data.data.days?r.data.data:null;
+ const cloud=clean(r.data&&r.data.data);
  if(S.owner&&S.owner!==uid)S=cloud?{...fresh(),...cloud}:fresh();else if(cloud)S=mergeS(S,cloud);
  S.owner=uid;synced=true;ok=true;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}await push()
  }catch(e){if(user&&user.id===uid&&S.owner&&S.owner!==uid){S=fresh();try{localStorage.removeItem(KEY)}catch(x){}}}
  if(!quiet||JSON.stringify(S)!==before)render()}
-async function push(){if(!sb||!user)return false;if(!synced){await pull();return synced}try{const r=await sb.from("progress").upsert({user_id:user.id,data:S,updated_at:new Date().toISOString()});return!(r&&r.error)}catch(e){return false}}
+async function push(){if(!sb||!user)return false;if(!synced){await pull();return synced}try{trimS();const r=await sb.from("progress").upsert({user_id:user.id,data:S,updated_at:new Date().toISOString()});return!(r&&r.error)}catch(e){return false}}
+async function delAcct(b){const m=$("#am"),c=($("#delc").value||"").trim().toUpperCase();if(c!=="DELETE"){m.textContent="Type DELETE to confirm.";return}if(!sb||!user)return;b.textContent="Deleting…";clearTimeout(pt);
+ let r;try{r=await sb.rpc("delete_my_account")}catch(e){r={error:e}}
+ if(r&&r.error){b.textContent="Delete everything";m.textContent="Couldn’t delete right now. Try again, or email coachcorn.dcsc@gmail.com from the address you signed in with.";return}
+ S=fresh();synced=false;try{localStorage.removeItem(KEY)}catch(e){}try{await sb.auth.signOut()}catch(e){}user=null;delAsk=false;delDone=true;view="today";F=null;render()}
 async function logout(b){if(!sb)return;clearTimeout(pt);if(b)b.textContent="Saving…";const ok=await push();if(!ok){if(b)b.textContent="Couldn’t save. Try again";return}
  S=fresh();try{localStorage.removeItem(KEY)}catch(e){}try{await sb.auth.signOut()}catch(e){}user=null;view="today";F=null;render()}
 function initSb(){if(sb||!window.supabase||!SB_URL.startsWith("https://"))return;
