@@ -91,6 +91,7 @@ nav button.on,.chip[aria-pressed=true],.sc button[aria-pressed=true],.btn{backgr
 .tick,.exr button,.vx{width:44px;height:44px}
 .chip,nav button,.hb,.btn,.inst .x{min-height:44px}.inst .x{min-width:44px}
 .exr input{min-height:44px}.nm{padding:8px 0}
+.lnk{background:none;border:0;padding:6px 0;color:var(--red);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer;min-height:44px}.rm,#bwi{width:90px}
 .fine a{color:inherit;display:inline-block;padding:12px 8px;font-weight:600}
 </style>
 </head>
@@ -110,13 +111,14 @@ const KEY="momentum.v2",$=s=>document.querySelector(s);
 const LIB=`
 // ======================  EXERCISE LIBRARY  ======================
 // TO ADD AN EXERCISE, add one line in this format:
-//     Name | equipment | joints it loads | unit | coaching cue | rep range (optional) | load (optional)
+//     Name | equipment | joints it loads | unit | coaching cue | rep range (optional) | load (optional) | intensity 1-10
 //
-// equipment : bw db band kb bench bb hex bar
+// equipment : bw db band kb bench bb hex bar cable
 //             comma = either one (db,kb)   plus = needs both (db+bench)
 // joints    : neck shoulder back hip knee ankle wrist
 //             (a person with pain there will not be given this move)
 // unit      : r = reps   rs = reps each side   s = seconds   ss = seconds each side   m = slow mobility reps
+// intensity : 1 easiest to 10 hardest. Add i after it (like 7i) for jumping or landing moves. Ladders are sorted by this number.
 // range     : like 5-8. If left off: 8-12 reps, 6-10 each side, 20-45 seconds
 // load      : load = show a weight box for this move, noload = never show one.
 //             If left off, moves that need db, kb, bb or hex get a weight box automatically.
@@ -127,87 +129,227 @@ const LIB=`
 // Every exercise name must be unique.
 
 # push | push | Horizontal push | ladder
-Incline Push-Up | bw | shoulder,wrist | r | Hands on a bench or wall, body long, elbows controlled.
-Push-Up | bw | shoulder,wrist | r | One straight line from head to heels, chest to a fist above the floor.
-Feet-Elevated Push-Up | bw | shoulder,wrist | r | Feet on a step, ribs down, hips do not sag.
-Clap Push-Up | bw | shoulder,wrist | r | Push fast, land softly with bent elbows. Quality over reps. | 4-8
-DB Floor Press | db | shoulder,wrist | r | Elbows about 45 degrees, light pause on the floor.
-DB Bench Press | db+bench | shoulder,wrist | r | Feet planted, shoulder blades pinned back.
-Incline DB Press | db+bench | shoulder,wrist | r | Low incline, press up and slightly back.
-Barbell Bench Press | bb+bench | shoulder,wrist | r | Use a spotter or safety arms. Bar to mid-chest. | 5-8
-Incline Barbell Bench Press | bb+bench | shoulder,wrist | r | Use a spotter or safety arms. Control the bar down. | 5-8
+Wall Push-Up | bw | shoulder,wrist | r | Hands on a wall, body in one line, chest to the wall. | 10-15 |  | 2
+Incline Push-Up | bw | shoulder,wrist | r | Hands on a bench or wall, body long, elbows controlled. |  |  | 3
+Knee Push-Up | bw | shoulder,wrist | r | Knees down, body in one line from knees to head. | 8-12 |  | 3
+Push-Up Plus | bw | shoulder,wrist | r | At the top, push the floor away and spread the shoulder blades. | 8-12 |  | 3
+Standing Cable Chest Press | cable | shoulder,wrist | r | Split stance, press forward without shrugging. | 10-15 |  | 3
+Cable Chest Fly | cable | shoulder | r | Soft elbows. Hug a big tree and squeeze at the front. | 10-15 |  | 3
+Push-Up | bw | shoulder,wrist | r | One straight line from head to heels, chest to a fist above the floor. |  |  | 4
+DB Floor Press | db | shoulder,wrist | r | Elbows about 45 degrees, light pause on the floor. |  |  | 4
+Neutral-Grip DB Floor Press | db | shoulder,wrist | r | Palms face each other, elbows about 45 degrees. | 8-12 |  | 4
+Single-Arm Cable Chest Press | cable | shoulder,wrist | rs | Brace the ribs so the trunk does not rotate. | 8-12 |  | 4
+Half-Kneeling Single-Arm Cable Press | cable | shoulder,wrist | rs | Tall posture, squeeze the glute on the down knee. | 8-12 |  | 4
+Tempo Push-Up | bw | shoulder,wrist | r | Lower for 3 seconds, then press up smoothly. | 6-10 |  | 5
+Close-Grip Push-Up | bw | shoulder,wrist | r | Hands under the shoulders, elbows tucked close. | 6-10 |  | 5
+Feet-Elevated Push-Up | bw | shoulder,wrist | r | Feet on a step, ribs down, hips do not sag. |  |  | 5
+Single-Arm DB Floor Press | db | shoulder,wrist | rs | Ribs down and hips level as one arm presses. | 6-10 |  | 5
+DB Bench Press | db+bench | shoulder,wrist | r | Feet planted, shoulder blades pinned back. |  |  | 5
+Neutral-Grip DB Bench Press | db+bench | shoulder,wrist | r | Palms face each other. Lower to the sides of the chest. | 8-12 |  | 5
+Incline DB Press | db+bench | shoulder,wrist | r | Low incline, press up and slightly back. |  |  | 5
+Archer Push-Up | bw | shoulder,wrist | rs | Shift toward one hand while the other arm stays long. | 3-6 |  | 6
+Single-Arm DB Bench Press | db+bench | shoulder,wrist | rs | Stay square on the bench and do not twist. | 6-10 |  | 6
+Barbell Floor Press | bb | shoulder,wrist | r | Lower until the upper arms touch the floor, then press. | 5-8 |  | 6
+Clap Push-Up | bw | shoulder,wrist | r | Push fast, land softly with bent elbows. Quality over reps. | 4-8 |  | 7i
+Barbell Bench Press | bb+bench | shoulder,wrist | r | Use a spotter or safety arms. Bar to mid-chest. | 5-8 |  | 7
+Close-Grip Barbell Bench Press | bb+bench | shoulder,wrist | r | Hands about shoulder width, elbows tucked. | 5-8 |  | 7
+Incline Barbell Bench Press | bb+bench | shoulder,wrist | r | Use a spotter or safety arms. Control the bar down. | 5-8 |  | 7
 
 # pull | pull | Horizontal pull | ladder
-Prone Y-T-W | bw | shoulder,neck,back | r | Move from the shoulder blades, thumbs up, no shrugging.
-Seated Band Row | band | shoulder,wrist | r | Sit tall, pull elbows toward the ribs.
-1/4 Squat Band Row | band | shoulder,knee | r | Hold a small squat while you row, chest tall.
-Inverted Row | bar | shoulder,wrist | r | Bar at waist height, body straight, pull chest to the bar.
-Bent-Over DB Row | db | back,shoulder,wrist | r | Flat back, pull the elbow to the hip.
-Bent-Over Barbell Row | bb | back,shoulder,wrist | r | Hinge, brace, pull the bar to the lower ribs. | 5-8
-Renegade Row | db | shoulder,wrist,back | rs | Wide feet, hips square, row without rotating. | 4-8
+Prone Y-T-W | bw | shoulder,neck,back | r | Move from the shoulder blades, thumbs up, no shrugging. |  |  | 2
+Prone Cobra | bw | back,neck | s | Squeeze the shoulder blades, lift the chest, keep the neck long. | 15-30 |  | 2
+Band Pull-Apart | band | shoulder | r | Arms straight, pull the band apart with the shoulder blades. | 12-20 |  | 2
+Cable Face Pull | cable | shoulder,neck | r | Pull to the face with elbows high, rotate the hands back. | 12-20 |  | 2
+Cable External Rotation | cable | shoulder | rs | Elbow at the side, rotate the forearm out slowly. | 10-15 |  | 2
+Seated Band Row | band | shoulder,wrist | r | Sit tall, pull elbows toward the ribs. |  |  | 3
+1/4 Squat Band Row | band | shoulder,knee | r | Hold a small squat while you row, chest tall. |  |  | 3
+Chest-Supported DB Y Raise | db+bench | shoulder,neck | r | Light weights, thumbs up, raise the arms into a Y. | 10-15 |  | 3
+Chest-Supported DB Reverse Fly | db+bench | shoulder | r | Light weights, open the arms wide and squeeze the back. | 10-15 |  | 3
+Cable Rear-Delt Fly | cable | shoulder | r | Arms cross in front, open wide with soft elbows. | 12-20 |  | 3
+Bent-Knee Inverted Row | bar | shoulder,wrist | r | Knees bent, body in one line, pull the chest to the bar. | 8-12 |  | 4
+Seated Cable Row | cable | back,shoulder,wrist | r | Tall chest, pull the elbows back, pause and squeeze. | 10-15 |  | 4
+Wide-Grip Seated Cable Row | cable | back,shoulder,wrist | r | Elbows flare out, pull to the upper chest. | 10-15 |  | 4
+Single-Arm Seated Cable Row | cable | back,shoulder,wrist | rs | Keep the shoulders square and pull the elbow back. | 8-12 |  | 4
+Chest-Supported DB Row | db+bench | shoulder,wrist | r | Chest on an incline bench, pull the elbows back. | 8-12 |  | 4
+Standing Single-Arm Cable Row | cable | shoulder,wrist,back | rs | Split stance, pull the elbow back without twisting. | 8-12 |  | 4
+Half-Kneeling Single-Arm Cable Row | cable | shoulder,wrist,back | rs | Tall half-kneel, pull the elbow back, squeeze the glute. | 8-12 |  | 4
+Bent-Over DB Reverse Fly | db | back,shoulder | r | Hinge forward, flat back, lift the arms out to the sides. | 10-15 |  | 4
+Inverted Row | bar | shoulder,wrist | r | Bar at waist height, body straight, pull chest to the bar. |  |  | 5
+Bent-Over DB Row | db | back,shoulder,wrist | r | Flat back, pull the elbow to the hip. |  |  | 5
+Single-Arm DB Row | db+bench | back,shoulder,wrist | rs | One hand on the bench, flat back, pull the elbow to the hip. | 8-12 |  | 5
+Feet-Elevated Inverted Row | bar+bench | shoulder,wrist | r | Feet on a bench, body straight, pull the chest to the bar. | 6-10 |  | 6
+Renegade Row | db | shoulder,wrist,back | rs | Wide feet, hips square, row without rotating. | 4-8 |  | 7
+Bent-Over Barbell Row | bb | back,shoulder,wrist | r | Hinge, brace, pull the bar to the lower ribs. | 5-8 |  | 7
+Pendlay Row | bb | back,shoulder,wrist | r | Bar starts on the floor each rep. Flat back, snap the bar to the lower chest. | 5-8 |  | 7
 
 # vpull | vpull | Vertical pull | ladder
-Seated Band Pull-Down | band | shoulder | r | Band anchored overhead, pull elbows to your ribs.
-Flexed-Arm Hang | bar | shoulder,wrist | s | Chin over the bar, hold still with shoulders down. | 10-30
-Scap Pull-Up | bar | shoulder | r | Hang and pull the shoulder blades down without bending the elbows. | 6-12
-Eccentric Pull-Up | bar | shoulder | r | Jump to the top, lower for 3 to 5 seconds. | 3-6
-Pull-Up | bar | shoulder | r | Full hang to chin over the bar, no kipping. | 3-8
+Prone Lat Pull | bw | shoulder,back | r | Lying face down, sweep the arms down toward the hips. | 10-15 |  | 2
+Seated Band Pull-Down | band | shoulder | r | Band anchored overhead, pull elbows to your ribs. |  |  | 3
+Kneeling Cable Straight-Arm Pulldown | cable | shoulder | r | Arms nearly straight, sweep down to the thighs. | 10-15 |  | 3
+Active Hang | bar | shoulder,wrist | s | Hang with the shoulders gently pulled down. | 15-40 |  | 3
+Lat Pulldown (Wide Grip) | cable | shoulder | r | Pull the bar to the upper chest, elbows down. | 8-12 |  | 4
+Neutral-Grip Lat Pulldown | cable | shoulder | r | Palms face each other. Pull the elbows to the ribs. | 8-12 |  | 4
+Scap Pull-Up | bar | shoulder | r | Hang and pull the shoulder blades down without bending the elbows. | 6-12 |  | 4
+Underhand Lat Pulldown | cable | shoulder | r | Palms toward you. Pull the bar to the upper chest. | 8-12 |  | 4
+Single-Arm Cable Pulldown | cable | shoulder | rs | One hand at a time, pull the elbow to the ribs. | 8-12 |  | 4
+Half-Kneeling Single-Arm Pulldown | cable | shoulder | rs | Tall half-kneel, ribs down, pull the elbow back. | 8-12 |  | 4
+Flexed-Arm Hang | bar | shoulder,wrist | s | Chin over the bar, hold still with shoulders down. | 10-30 |  | 5
+Tempo Lat Pulldown | cable | shoulder | r | Pull for 1 second, return for 4 seconds. | 6-10 |  | 5
+Band-Assisted Chin-Up | bar+band | shoulder | r | The band helps at the bottom. Pull the chest to the bar. | 5-10 |  | 5
+Band-Assisted Pull-Up | bar+band | shoulder | r | The band helps at the bottom. Pull the chest to the bar. | 5-10 |  | 5
+Eccentric Chin-Up | bar | shoulder | r | Jump to the top with palms toward you, lower for 3 to 5 seconds. | 3-6 |  | 6
+Eccentric Pull-Up | bar | shoulder | r | Jump to the top, lower for 3 to 5 seconds. | 3-6 |  | 6
+Pull-Up | bar | shoulder | r | Full hang to chin over the bar, no kipping. | 3-8 |  | 7
+Chin-Up | bar | shoulder | r | Palms toward you, pull the chin over the bar. | 3-8 |  | 7
+Neutral-Grip Pull-Up | bar | shoulder | r | Palms face each other if the bar allows. Smooth and controlled. | 3-8 |  | 7
+L-Sit Hang | bar | shoulder,wrist,hip | s | Hang with the legs straight out in front. | 10-25 |  | 7
+Wide-Grip Pull-Up | bar | shoulder | r | Hands wider than the shoulders, lead with the chest. | 3-6 |  | 8
+Slow-Tempo Pull-Up | bar | shoulder | r | Lower for 5 seconds on every rep. | 3-6 |  | 8
+Commando Pull-Up | bar | shoulder | rs | Hands in line on the bar. Alternate which side the head passes. | 3-6 |  | 8
+Archer Pull-Up | bar | shoulder | rs | Pull toward one hand while the other arm stays long. | 2-5 |  | 9
+Weighted Pull-Up | bar+db | shoulder | r | Hold a dumbbell between the feet. Smooth reps. | 3-6 |  | 9
 
 # hip | hinge | Hip dominant | ladder
-Glute Bridge | bw | hip | r | Finish with the glutes, not the low back.
-Single-Leg Glute Bridge | bw | hip,knee | rs | Keep the hips level.
-Feet-Elevated Glute Bridge | bw | hip | r | Heels on a step, drive up and squeeze.
-Feet-Elevated Single-Leg Glute Bridge | bw | hip,knee | rs | Heel on a step, hips level, no twisting.
-Hip Thrust | bench | hip | r | Upper back on the bench, chin tucked, pause at the top.
-Barbell Glute Bridge | bb | hip | r | Bar over the hips with a pad, drive through the heels. | 6-10
-Barbell Hip Thrust | bb+bench | hip | r | Bar over the hips with a pad, ribs down at the top. | 6-10
-Single-Leg Reaching RDL | bw | back,hip,ankle | rs | Reach long, hips square, soft knee.
-KB Single-Leg RDL | kb | back,hip,ankle | rs | Hips square, bell close, long spine. | 6-10
-Barbell RDL | bb | back,hip | r | Hips back, bar close to the legs. | 6-10
-Dumbbell RDL | db | back,hip | r | Hips back, weights close, flat back.
-KB Deadlift | kb | back,hip,knee | r | Brace first, then push the floor away.
-Hex-Bar Deadlift | hex | back,hip,knee | r | Brace, push the floor away, stand tall. | 5-8
-Conventional Deadlift | bb | back,hip,knee | r | Bar over mid-foot, tight lats, push the floor away. | 3-6
-Sumo Deadlift | bb | back,hip,knee | r | Wide stance, chest up, spread the floor. | 3-6
-Snatch-Grip Deadlift | bb | back,hip,knee,shoulder | r | Wide grip, long back, controlled lowering. | 3-6
-Single-Arm DB Snatch | db | back,hip,shoulder,wrist | rs | Hip drive does the work, punch through at the top. | 3-6
+Glute Bridge | bw | hip | r | Finish with the glutes, not the low back. |  |  | 2
+Quadruped Hip Extension | bw | hip,wrist,knee | rs | On hands and knees, press one heel back without arching the low back. | 8-12 |  | 2
+Cable Hip Abduction | cable | hip | rs | Ankle strap. Lift the leg out to the side, toes forward. | 10-15 |  | 2
+Single-Leg Glute Bridge | bw | hip,knee | rs | Keep the hips level. |  |  | 3
+Feet-Elevated Glute Bridge | bw | hip | r | Heels on a step, drive up and squeeze. |  |  | 3
+Hip Thrust | bench | hip | r | Upper back on the bench, chin tucked, pause at the top. |  |  | 3
+Cable Pull-Through | cable | hip,back | r | Face away, hinge back, then squeeze the glutes to stand. | 10-15 |  | 3
+Cable Glute Kickback | cable | hip,knee | rs | Ankle strap. Kick back with the glute, not the low back. | 10-15 |  | 3
+Single-Leg Reaching RDL | bw | back,hip,ankle | rs | Reach long, hips square, soft knee. |  |  | 3
+Hamstring Bridge Walkout | bw | hip | r | In a bridge, walk the feet out and back slowly. | 5-10 |  | 4
+Feet-Elevated Single-Leg Glute Bridge | bw | hip,knee | rs | Heel on a step, hips level, no twisting. |  |  | 4
+Single-Leg Hip Thrust | bench | hip,knee | rs | Upper back on the bench, drive through one heel. | 6-10 |  | 5
+Dumbbell RDL | db | back,hip | r | Hips back, weights close, flat back. |  |  | 5
+Single-Leg Cable RDL | cable | back,hip,ankle | rs | Hinge on one leg, flat back, hips square. | 6-10 |  | 5
+KB Deadlift | kb | back,hip,knee | r | Brace first, then push the floor away. |  |  | 5
+Barbell Glute Bridge | bb | hip | r | Bar over the hips with a pad, drive through the heels. | 6-10 |  | 5
+Single-Leg DB RDL | db | back,hip,ankle | rs | Hinge on one leg, flat back, reach the weight toward the floor. | 6-10 |  | 6
+KB Single-Leg RDL | kb | back,hip,ankle | rs | Hips square, bell close, long spine. | 6-10 |  | 6
+Barbell Hip Thrust | bb+bench | hip | r | Bar over the hips with a pad, ribs down at the top. | 6-10 |  | 6
+Barbell RDL | bb | back,hip | r | Hips back, bar close to the legs. | 6-10 |  | 7
+Hex-Bar Deadlift | hex | back,hip,knee | r | Brace, push the floor away, stand tall. | 5-8 |  | 8
+Single-Arm DB Snatch | db | back,hip,shoulder,wrist | rs | Hip drive does the work, punch through at the top. | 3-6 |  | 8
+Conventional Deadlift | bb | back,hip,knee | r | Bar over mid-foot, tight lats, push the floor away. | 3-6 |  | 9
+Sumo Deadlift | bb | back,hip,knee | r | Wide stance, chest up, spread the floor. | 3-6 |  | 9
+Snatch-Grip Deadlift | bb | back,hip,knee,shoulder | r | Wide grip, long back, controlled lowering. | 3-6 |  | 9
 
 # squat | squat | Knee dominant | ladder
-Isometric Split Squat | bw | knee,hip,ankle | ss | Hold the bottom position, front foot flat. | 15-30
-Arms-on-Wall Squat | bw | knee,hip,ankle | r | Hands on a wall for balance, sit down and back.
-Prisoner Squat | bw | knee,hip,ankle | r | Hands behind the head, chest tall.
-Single-Leg Box Squat | bw | knee,hip,ankle | rs | Sit back to a box on one leg, control the whole way. | 4-8
-Bodyweight Split Squat | bw | knee,hip,ankle | rs | Back knee straight down, front foot grounded.
-Goblet Squat | db,kb | knee,hip,ankle | r | Stay tall and drive through the whole foot.
-Rear-Foot-Elevated Split Squat | bench | knee,hip,ankle | rs | Back foot on a bench, torso tall, front foot grounded. | 6-10
-Overhead Squat | bb | shoulder,back,knee,hip,ankle | r | Bar locked out overhead, ribs down. Learn it with a dowel first. | 3-6
+Arms-on-Wall Squat | bw | knee,hip,ankle | r | Hands on a wall for balance, sit down and back. |  |  | 2
+Wall Sit | bw | knee,hip,ankle | s | Back on the wall, knees at about 90 degrees. | 20-45 |  | 3
+Isometric Split Squat | bw | knee,hip,ankle | ss | Hold the bottom position, front foot flat. | 15-30 |  | 3
+Box Squat | bench | knee,hip,ankle | r | Sit back to the box, pause, stand up without rocking. | 8-12 |  | 3
+Prisoner Squat | bw | knee,hip,ankle | r | Hands behind the head, chest tall. |  |  | 3
+Step-Up | bench | knee,hip,ankle | rs | Drive through the whole foot and stand tall. | 8-12 |  | 4
+Reverse Lunge | bw | knee,hip,ankle | rs | Step back, drop the back knee, push through the front foot. | 8-12 |  | 4
+Lateral Lunge | bw | knee,hip,ankle | rs | Sit back into one hip, keep the other leg straight. | 6-10 |  | 4
+Bodyweight Split Squat | bw | knee,hip,ankle | rs | Back knee straight down, front foot grounded. |  |  | 5
+Single-Leg Box Squat | bw | knee,hip,ankle | rs | Sit back to a box on one leg, control the whole way. | 4-8 |  | 5
+Cable Reverse Lunge | cable | knee,hip,ankle | rs | Hold the handle at the chest and step back. | 8-12 |  | 5
+Lateral Step-Down | bench | knee,hip,ankle | rs | Slowly lower the heel to the floor, knee tracking over the toes. | 6-10 |  | 5
+Cossack Squat | bw | knee,hip,ankle | rs | Wide stance, sink into one side, keep the heel down. | 5-8 |  | 5
+Walking Lunge | bw | knee,hip,ankle | rs | Long steps, torso tall. | 8-12 |  | 5
+Tempo Goblet Squat | db,kb | knee,hip,ankle | r | Lower for 3 seconds, pause, stand up. | 6-10 |  | 5
+Goblet Squat | db,kb | knee,hip,ankle | r | Stay tall and drive through the whole foot. |  |  | 5
+Heel-Elevated Goblet Squat | db,kb | knee,hip,ankle | r | Heels on a plate or book. Stay tall. | 8-12 |  | 5
+Cable Front Squat | cable | knee,hip,ankle | r | Hold the handle at the chest and squat tall. | 8-12 |  | 5
+Goblet Reverse Lunge | db,kb | knee,hip,ankle | rs | Hold the weight at the chest and step back. | 6-10 |  | 6
+DB Step-Up | db+bench | knee,hip,ankle | rs | Weights at your sides, drive through the whole front foot. | 6-10 |  | 6
+Rear-Foot-Elevated Split Squat | bench | knee,hip,ankle | rs | Back foot on a bench, torso tall, front foot grounded. | 6-10 |  | 6
+DB Rear-Foot-Elevated Split Squat | db+bench | knee,hip,ankle | rs | Back foot on the bench, torso tall, weights at your sides. | 6-10 |  | 7
+Barbell Front Squat | bb | knee,hip,ankle,wrist | r | Bar on the front shoulders, elbows high. | 5-8 |  | 8
+Barbell Back Squat | bb | knee,hip,ankle,back | r | Bar on the upper back, brace and sit between the hips. | 5-8 |  | 8
+Overhead Squat | bb | shoulder,back,knee,hip,ankle | r | Bar locked out overhead, ribs down. Learn it with a dowel first. | 3-6 |  | 8
+
+# cond | cond | Conditioning | list
+March in Place (Low Impact) | bw |  | s | Lift the knees, swing the arms, keep a brisk pace. | 30-60 |  | 2
+Step Jacks (Low Impact) | bw | shoulder | s | Step out one side at a time while the arms sweep overhead. | 30-60 |  | 3
+Jumping Jacks | bw | ankle | s | Light and rhythmic. Land softly. | 30-60 |  | 4i
+Seal Jacks | bw | shoulder | s | Arms swing wide and clap in front while the feet jump in and out. | 30-60 |  | 4
+Plank Jacks | bw | wrist,shoulder | s | In a plank, step or jump the feet wide and back. | 20-40 |  | 5
+Fast Feet | bw | ankle,knee | s | Tiny quick steps, stay light. | 20-40 |  | 5i
+Butt Kicks | bw | knee | s | Kick the heels up toward the glutes at a steady pace. | 20-45 |  | 4
+High Knees | bw | knee,hip,ankle | s | Drive the knees up, pump the arms, stay light on your feet. | 20-45 |  | 5
+Lateral Shuffle | bw | knee,hip,ankle | s | Stay low, step side to side without crossing the feet. | 20-45 |  | 5
+Skater Hops | bw | knee,hip,ankle | s | Hop side to side, land on one foot with a soft knee. | 20-45 |  | 6i
+Squat Jumps | bw | knee,hip,ankle | s | Squat, jump, and land softly with bent knees. | 15-40 |  | 7i
+Mountain Climbers | bw | wrist,shoulder | s | Shoulders over wrists, drive knees toward the chest, hips level. | 20-45 |  | 6
+Inchworm Walkout | bw | wrist,shoulder,back | s | Walk the hands out to a plank and walk back. | 30-60 |  | 4
+Bear Crawl | bw | wrist,shoulder,knee | s | Knees hover, move the opposite hand and foot together. | 20-40 |  | 6
+Crab Reach | bw | wrist,shoulder | s | Hips up, reach one arm over, alternate sides. | 20-45 |  | 4
+Shadow Boxing | bw | shoulder | s | Stay light on your feet and snap the punches. Stay relaxed. | 30-60 |  | 4
+Jump Rope (or Pretend Rope) | bw | ankle,knee | s | Small hops. Let the wrists turn the rope. | 30-60 |  | 6i
+Bench Step-Ups | bench | knee,hip,ankle | s | Drive through the whole foot and stand tall at the top. | 30-60 |  | 5
+Burpees | bw | wrist,shoulder,back,knee,ankle | s | Hands down, step or jump back, stand up. Keep your breathing steady. | 20-40 |  | 8i
+Shuttle Run | bw | knee,ankle,hip | s | Sprint 10 steps one way, touch the floor, sprint back. | 20-40 |  | 7i
+Sprint Intervals | bw | knee,ankle,hip | s | Fast but smooth, then walk back to recover. | 10-30 |  | 9i
+Steady Easy Cardio | bw |  | s | Walk, jog, bike or row at a pace where you can still talk. | 300-900 |  | 3
+KB Swing | kb | back,hip,wrist | r | Hinge at the hips and snap them forward. The bell floats to chest height. | 10-20 |  | 7
+Single-Arm KB Swing | kb | back,hip,wrist | rs | One hand, hinge and snap the hips, resist the twist. | 8-15 |  | 7
+KB Clean | kb | back,hip,wrist,shoulder | rs | Hinge, snap the hips, guide the bell softly to the rack. | 6-10 |  | 8
 
 # mob | mob | Mobility | list
-Cat-Cow Flow | bw | wrist | m | Move slowly with your breath.
-World’s Greatest Stretch | bw | knee,hip,wrist | m | Own each position and never force range.
-90/90 Hip Switch | bw | hip,knee | m | Rotate through the hips with control.
-Open Book Rotation | bw | shoulder | m | Keep hips stacked as the chest turns.
-Ankle Rocking | bw | ankle,knee | m | Heel stays planted.
-Chin Tuck Reset | bw | neck | m | Glide the chin straight back, no strain.
-Wall Slide | bw | shoulder,neck | m | Ribs down, stay pain-free.
-Half-Kneeling Hip Flexor Stretch | bw | hip,knee | m | Squeeze the glute on the kneeling side.
-Thread the Needle | bw | shoulder,wrist,knee | m | Rotate through the upper back.
-Supine Figure-4 Stretch | bw | hip | m | Relax into it and breathe slowly.
-90/90 Breathing | bw | | m | Legs on a chair, slow exhale, ribs down.
+90/90 Breathing | bw |  | m | Legs on a chair, slow exhale, ribs down. |  |  | 1
+Cat-Cow Flow | bw | wrist | m | Move slowly with your breath. |  |  | 1
+Child’s Pose Reach | bw | knee | m | Sit back and walk the hands forward to stretch the sides. |  |  | 1
+Prone Press-Up (Sphinx) | bw | back,wrist | m | Prop on the forearms, gently lift the chest, glutes soft. |  |  | 2
+Thoracic Extension Over Bench | bench | shoulder,neck | m | Elbows on the bench, sink the chest toward the floor. |  |  | 2
+Quadruped T-Spine Rotation | bw | wrist,shoulder,knee | m | One hand behind the head, rotate the elbow up toward the ceiling. |  |  | 2
+Open Book Rotation | bw | shoulder | m | Keep hips stacked as the chest turns. |  |  | 1
+Thread the Needle | bw | shoulder,wrist,knee | m | Rotate through the upper back. |  |  | 1
+Doorway Pec Stretch | bw | shoulder | m | Forearm on a door frame, step through until the chest opens. |  |  | 1
+Wall Slide | bw | shoulder,neck | m | Ribs down, stay pain-free. |  |  | 2
+Scapular CARs | bw | shoulder | m | Slow, big circles with the shoulder blades, ribs still. |  |  | 2
+Chin Tuck Reset | bw | neck | m | Glide the chin straight back, no strain. |  |  | 1
+Levator Scapulae Stretch | bw | neck | m | Chin toward the armpit, gentle pull with the hand. |  |  | 1
+Upper Trap Stretch | bw | neck | m | Ear toward the shoulder, the opposite shoulder down. |  |  | 1
+Wrist Flexor and Extensor Stretch | bw | wrist | m | Arm straight, gently pull the fingers back, then down. |  |  | 1
+Half-Kneeling Hip Flexor Stretch | bw | hip,knee | m | Squeeze the glute on the kneeling side. |  |  | 2
+Couch Stretch | bw | knee,hip | m | Back foot up on a wall, squeeze the glute, stand tall. |  |  | 2
+90/90 Hip Switch | bw | hip,knee | m | Rotate through the hips with control. |  |  | 2
+Hip CARs | bw | hip | m | Slow, big circles with the knee, pelvis still. |  |  | 2
+Supine Figure-4 Stretch | bw | hip | m | Relax into it and breathe slowly. |  |  | 1
+Standing Hamstring Stretch | bw | back,hip | m | Heel forward, flat back, hinge until you feel a pull. |  |  | 1
+Wall Calf Stretch | bw | ankle | m | Hands on the wall, back heel down, knee straight. |  |  | 1
+Ankle Rocking | bw | ankle,knee | m | Heel stays planted. |  |  | 1
+Deep Squat Hold | bw | knee,hip,ankle | s | Sink to a comfortable depth, chest tall, breathe. | 20-45 |  | 2
+World’s Greatest Stretch | bw | knee,hip,wrist | m | Own each position and never force range. |  |  | 2
 
 # core | core | Core | list
-Dead Bug | bw | | r | Low back gently connected to the floor.
-Bird Dog | bw | wrist,knee,shoulder | r | Reach long without rotating.
-Pallof Press | band | shoulder | rs | Resist rotation as the hands press out.
-Suitcase Hold | db,kb | back,wrist | ss | Stay tall and do not lean.
-Forearm Side Plank | bw | shoulder | ss | Stack the hips in one long line.
+Dead Bug | bw |  | r | Low back gently connected to the floor. |  |  | 2
+Bird Dog | bw | wrist,knee,shoulder | r | Reach long without rotating. |  |  | 2
+Forearm Plank | bw | shoulder | s | Elbows under the shoulders, body in one line, squeeze the glutes. | 20-45 |  | 3
+Forearm Side Plank | bw | shoulder | ss | Stack the hips in one long line. |  |  | 4
+Bear Hold | bw | wrist,knee,shoulder | s | Knees hover an inch off the floor, back flat. | 15-30 |  | 4
+Superman Hold | bw | back | s | Lift the arms and legs a little, neck long. | 15-30 |  | 3
+Heel-Tap Dead Bug | bw |  | rs | Low back on the floor, tap one heel at a time. | 8-12 |  | 3
+Plank Shoulder Taps | bw | wrist,shoulder | rs | Wide feet, tap the shoulder, hips stay level. | 6-10 |  | 5
+Hollow Hold | bw |  | s | Low back pressed down, arms and legs long and low. | 15-30 |  | 5
+Side Plank Hip Dip | bw | shoulder | rs | In a side plank, lower the hip a little and lift. | 6-10 |  | 5
+Pallof Press | band | shoulder | rs | Resist rotation as the hands press out. |  |  | 3
+Pallof Hold | band | shoulder | ss | Press out and hold, resist the pull. | 15-30 |  | 3
+Cable Pallof Press | cable | shoulder | rs | Press out and resist the pull. | 8-12 |  | 3
+Half-Kneeling Cable Pallof Press | cable | shoulder | rs | Tall half-kneel, press and resist twisting. | 8-12 |  | 4
+Cable Wood Chop | cable | back,shoulder | rs | Chop high to low across the body, pivot the feet. | 8-12 |  | 4
+Cable Lift | cable | back,shoulder | rs | Low to high across the body, brace and rotate. | 8-12 |  | 4
+Standing Cable Rotation | cable | back | rs | Arms straight, rotate from the ribs, hips steady. | 8-12 |  | 3
+Kneeling Cable Crunch | cable | back | r | Curl the ribs toward the hips, hips stay still. | 10-15 |  | 4
+Suitcase Hold | db,kb | back,wrist | ss | Stay tall and do not lean. |  |  | 4
+Suitcase Carry | db,kb | back,wrist | ss | Walk tall holding one weight at your side. | 20-40 |  | 5
+Farmer Carry | db,kb | back,wrist | s | Walk tall with a weight in each hand. | 20-40 |  | 6
+Copenhagen Plank (Bent Knee) | bench | shoulder,hip | ss | Top knee on a bench, lift the hips. | 10-25 |  | 6
+Hanging Knee Raise | bar | shoulder,wrist | r | Hang tall, lift the knees without swinging. | 6-12 |  | 5
+Hanging Leg Raise | bar | shoulder,wrist | r | Hang tall, lift straight legs slowly. | 4-10 |  | 7
+Goblet Carry | db,kb | back,wrist | s | Hold one weight at your chest and walk tall. | 20-40 |  | 5
 `;
 const LADS=[],EX=[];
 LIB.split("\n").forEach(raw=>{const line=raw.trim();if(!line||line.startsWith("//"))return;
  if(line[0]==="#"){const[id,pat,title,kind]=line.slice(1).split("|").map(x=>x.trim());LADS.push({id,pat,title,ladder:kind==="ladder",steps:[]});return}
  const g=LADS[LADS.length-1];if(!g)return;
- const[name,eq,jt,unit,cue,rg,fl]=line.split("|").map(x=>x.trim());
- const e={name,pat:g.pat,lad:g.ladder?g.id:null,eq:(eq||"bw").split(",").map(x=>x.split("+").map(y=>y.trim())),jt:jt?jt.split(",").map(x=>x.trim()):[],unit:unit||"r",cue:cue||""};e.load=fl==="noload"?false:fl==="load"?true:e.eq.some(g=>g.some(x=>["db","kb","bb","hex"].includes(x)));
+ const[name,eq,jt,unit,cue,rg,fl,sc]=line.split("|").map(x=>x.trim());
+ const e={name,pat:g.pat,lad:g.ladder?g.id:null,eq:(eq||"bw").split(",").map(x=>x.split("+").map(y=>y.trim())),jt:jt?jt.split(",").map(x=>x.trim()):[],unit:unit||"r",cue:cue||""};e.load=fl==="noload"?false:fl==="load"?true:e.eq.some(g=>g.some(x=>["db","kb","bb","hex","cable"].includes(x)));e.sc=parseInt(sc)||5;e.imp=/i/i.test(sc||"");
  const R=rg?rg.split("-").map(Number):null,df={r:[8,12],rs:[6,10],s:[20,45],ss:[15,30],m:[8,8]}[e.unit]||[8,12];
  e.lo=R?R[0]:df[0];e.hi=R?R[1]:df[1];EX.push(e);g.steps.push(e)});
 const ex=n=>EX.find(e=>e.name===n),UL={r:"reps",rs:"reps each side",s:"sec",ss:"sec each side",m:"slow reps"};
@@ -239,21 +381,30 @@ function openVid(name,opener){const e=ex(name);if(!e)return;vOpener=opener;$("#v
 function closeVid(){$("#vb").innerHTML="";$("#vm").hidden=true;document.body.style.overflow="";if(vOpener&&vOpener.focus)vOpener.focus()}
 addEventListener("keydown",ev=>{if(ev.key==="Escape"){if(!$("#qm").hidden)closeQ();else if(!$("#tm").hidden)closeTimer();else if(!$("#dm").hidden)closeDay();else if(!$("#vm").hidden)closeVid()}});
 const PCT=[[1,100],[3,93],[5,85],[7,77],[10,67],[12,62],[15,58],[20,50]],LB=2.2046226218;
+const R3={"DB Floor Press":.20,"DB Bench Press":.22,"Incline DB Press":.18,"Barbell Bench Press":.55,"Incline Barbell Bench Press":.45,"Bent-Over DB Row":.22,"Bent-Over Barbell Row":.50,"Renegade Row":.10,"Barbell Glute Bridge":.75,"Barbell Hip Thrust":.85,"KB Single-Leg RDL":.12,"Barbell RDL":.65,"Dumbbell RDL":.22,"KB Deadlift":.30,"Hex-Bar Deadlift":.85,"Conventional Deadlift":.90,"Sumo Deadlift":.90,"Snatch-Grip Deadlift":.65,"Single-Arm DB Snatch":.12,"Goblet Squat":.25,"Overhead Squat":.35,"Suitcase Hold":.20,"KB Swing":.45,"Neutral-Grip DB Floor Press":0.2,"Single-Arm DB Floor Press":0.22,"Neutral-Grip DB Bench Press":0.22,"Single-Arm DB Bench Press":0.22,"Barbell Floor Press":0.5,"Close-Grip Barbell Bench Press":0.45,"Standing Cable Chest Press":0.2,"Cable Chest Fly":0.1,"Single-Arm Cable Chest Press":0.12,"Half-Kneeling Single-Arm Cable Press":0.12,"Chest-Supported DB Row":0.22,"Chest-Supported DB Y Raise":0.05,"Chest-Supported DB Reverse Fly":0.07,"Single-Arm DB Row":0.25,"Bent-Over DB Reverse Fly":0.07,"Pendlay Row":0.45,"Cable Face Pull":0.15,"Cable External Rotation":0.05,"Seated Cable Row":0.45,"Wide-Grip Seated Cable Row":0.4,"Single-Arm Seated Cable Row":0.22,"Cable Rear-Delt Fly":0.08,"Standing Single-Arm Cable Row":0.2,"Half-Kneeling Single-Arm Cable Row":0.2,"Kneeling Cable Straight-Arm Pulldown":0.2,"Lat Pulldown (Wide Grip)":0.5,"Neutral-Grip Lat Pulldown":0.5,"Underhand Lat Pulldown":0.5,"Single-Arm Cable Pulldown":0.25,"Half-Kneeling Single-Arm Pulldown":0.25,"Tempo Lat Pulldown":0.45,"Weighted Pull-Up":0.1,"Single-Leg DB RDL":0.15,"Cable Pull-Through":0.35,"Cable Glute Kickback":0.12,"Cable Hip Abduction":0.08,"Single-Leg Cable RDL":0.12,"Tempo Goblet Squat":0.25,"Heel-Elevated Goblet Squat":0.25,"Goblet Reverse Lunge":0.2,"DB Step-Up":0.15,"DB Rear-Foot-Elevated Split Squat":0.15,"Barbell Front Squat":0.5,"Barbell Back Squat":0.7,"Cable Reverse Lunge":0.1,"Cable Front Squat":0.2,"Single-Arm KB Swing":0.35,"KB Clean":0.25,"Suitcase Carry":0.2,"Farmer Carry":0.25,"Goblet Carry":0.2,"Cable Pallof Press":0.06,"Half-Kneeling Cable Pallof Press":0.06,"Cable Wood Chop":0.1,"Cable Lift":0.1,"Standing Cable Rotation":0.1,"Kneeling Cable Crunch":0.25},LVF={beg:1,int:1.35,adv:1.7};
+const isHold=e=>e.unit==="s"||e.unit==="ss",isSteady=e=>e.name==="Steady Easy Cardio";
+function startRM(e){const r=R3[e.name];return r&&S.bw>0?S.bw*r*(LVF[S.set.level||"beg"]||1):null}
 const fmt=v=>String(Math.round(v*10)/10),isKg=()=>S.set.units==="kg",toU=kg=>isKg()?kg:kg*LB,fromU=v=>isKg()?v:v/LB;
 function pct(r){r=Math.max(1,Math.min(20,Math.round(r)));for(let i=1;i<PCT.length;i++){const[a,pa]=PCT[i-1],[b,pb]=PCT[i];if(r<=b)return pa+(pb-pa)*(r-a)/(b-a)}return 50}
-function wtInfo(n){const h=((S.wt||{})[n]||{}).h||[],last=h[h.length-1]||null,es=h.filter(x=>x.e).slice(-3).map(x=>x.e),cur=es.length?Math.max(...es):null,pr=h.reduce((m,x)=>x.e&&x.e>m?x.e:m,0);return{h,last,cur,pr}}
+function wtInfo(n){const h=((S.wt||{})[n]||{}).h||[],man0=h.filter(x=>x.m).reduce((a,b)=>!a||(+b.m)>=(+a.m)?b:a,null),man=man0&&!man0.clr?man0:null,
+ hh=man0?(man?h.filter(x=>x===man0||(!x.m&&x.d>man0.d)):h.filter(x=>!x.m)):h,ok=h.filter(x=>!x.clr&&(!x.m||x===man)),last=ok[ok.length-1]||null,es=hh.filter(x=>x.e).slice(-3).map(x=>x.e),cur=es.length?Math.max(...es):null,pr=ok.reduce((m,x)=>x.e&&x.e>m?x.e:m,0);return{h,last,cur,pr,man}}
+function setRM(n,v){const e=ex(n);if(!e||!e.load||isHold(e))return;S.wt=S.wt||{};const o=S.wt[n]=S.wt[n]||{h:[]},d=today();
+ if(v>0&&v<=2000){const kg=Math.round(fromU(v)*1000)/1000;o.h.push({d,kg,r:3,u:e.unit,e:Math.round(kg/(pct(3)/100)*1000)/1000,m:Date.now()})}else o.h.push({d,kg:0,r:0,u:e.unit,e:null,m:Date.now(),clr:1});
+ o.h=o.h.slice(-40);save()}
+function setBW(v){const kg=fromU(v);if(kg>=20&&kg<=400)S.bw=Math.round(kg*100)/100;else delete S.bw;save()}
 function sugW(cur,t){const k=isKg(),v=toU(cur*pct(t)/100),inc=v<(k?10:25)?(k?1:2.5):(k?2.5:5);return Math.max(inc,Math.round(v/inc)*inc)}
 function wtSuggestHTML(e,t){const u=isKg()?"kg":"lb",i=wtInfo(e.name),L=i.last,hold=e.unit==="s"||e.unit==="ss";
- if(!L)return`<small class="wsug">${hold?"Log the weight you use.":`First time: pick a weight you can lift for about ${t} reps with good form, then log the weight and reps. After that we suggest weights from your numbers.`}</small>`;
+ if(!L){const sr=startRM(e),u2=isKg()?"kg":"lb";if(sr){const w0=sugW(sr/(pct(3)/100),hold?3:t);return`<small class="wsug">Start with about <b>${fmt(w0)} ${u2}</b>${hold?" in each hand":""} (estimate from your body weight). Log what you really use and it adjusts. <button class="lnk" data-a="tab" data-v="prog">Enter your 3RM</button></small>`}
+ return`<small class="wsug">${hold?"Log the weight you use.":`First time: pick a weight you can lift for about ${t} reps with good form, then log the weight and reps.`} For a starting weight, <button class="lnk" data-a="tab" data-v="prog">enter your body weight or 3RM</button> on Progress.</small>`}
  if(hold||!i.cur)return`<small class="wsug">Last: ${fmt(toU(L.kg))} ${u}${hold?` for ${L.r} ${UL[L.u]||"sec"}`:` × ${L.r}`}</small>`;
- return`<small class="wsug">Try <b>${fmt(sugW(i.cur,t))} ${u}</b> · last ${fmt(toU(L.kg))} ${u} × ${L.r}</small>`}
+ return`<small class="wsug">Try <b>${fmt(sugW(i.cur,t))} ${u}</b> · ${L.m?`from your ${fmt(toU(L.kg))} ${u} 3RM`:`last ${fmt(toU(L.kg))} ${u} × ${L.r}`}</small>`}
 function recW(wk,k){S.wt=S.wt||{};let c=0;wk.plan.forEach(p=>{const l=wk.log[p.n];if(!l||!l.done||!(+l.kg>0))return;const e=ex(p.n);if(!e||!e.load)return;
  const hold=e.unit==="s"||e.unit==="ss",r=(+l.a>0)?Math.round(+l.a):tgt(p.n),kg=Math.round(+l.kg*1000)/1000;
  const en={d:k,kg,r,u:e.unit,e:(hold||r>20)?null:Math.round(kg/(pct(r)/100)*1000)/1000};
  const o=S.wt[p.n]=S.wt[p.n]||{h:[]};o.h.push(en);o.h=o.h.slice(-40);c++});return c}
 function mergeWt(a,b){a=a||{};b=b||{};const o={};for(const n of new Set([...Object.keys(a),...Object.keys(b)])){const seen=new Set(),h=[...((a[n]||{}).h||[]),...((b[n]||{}).h||[])].filter(x=>{const q=x.d+"|"+x.kg+"|"+x.r+"|"+x.u;if(seen.has(q))return false;seen.add(q);return true}).sort((x,y)=>x.d<y.d?-1:x.d>y.d?1:0).slice(-40);o[n]={h}}return o}
 function weightsCard(){const u=isKg()?"kg":"lb",W=S.wt||{};
- const list=Object.keys(W).filter(n=>ex(n)&&W[n].h&&W[n].h.length).sort((a,b)=>{const x=W[a].h[W[a].h.length-1].d,y=W[b].h[W[b].h.length-1].d;return x<y?1:x>y?-1:0}).slice(0,12).map(n=>{const i=wtInfo(n),L=i.last;
+ const list=Object.keys(W).filter(n=>ex(n)&&W[n].h&&W[n].h.length&&wtInfo(n).last).sort((a,b)=>{const x=W[a].h[W[a].h.length-1].d,y=W[b].h[W[b].h.length-1].d;return x<y?1:x>y?-1:0}).slice(0,12).map(n=>{const i=wtInfo(n),L=i.last;
   return`<div class="row"><span>${n}<br><small class="muted">Last ${fmt(toU(L.kg))} ${u} × ${L.r} ${UL[L.u]||"reps"}${i.pr?` · best est. max ${fmt(toU(i.pr))} ${u}`:""}</small></span><b>${i.cur?fmt(toU(i.cur))+" "+u:"–"}</b></div>`}).join("")||`<p class="muted">Type the weight you used next to each loaded exercise in your workout. Your history and suggested weights show up here.</p>`;
  const tb=PCT.map(([r,p])=>`<tr><td>${r}</td><td>${p}%</td></tr>`).join("");
  return`<section class="card"><h3>Weights</h3><div class="chips">${[["lb","Pounds"],["kg","Kilograms"]].map(([v,l])=>`<button class="chip" data-a="units" data-v="${v}" aria-pressed="${u===v}">${l}</button>`).join("")}</div>${list}
@@ -269,13 +420,13 @@ const availOf=(l,c)=>l.steps.filter(e=>eqOK(e,c)&&painOK(e,c));
 const tierOf=(l,e)=>{const n=l.steps.length,p=l.steps.indexOf(e);return["Easy","Medium","Hard","Elite"][Math.min(3,Math.floor((n>1?p/(n-1):0)*4))]};
 const stepNear=(l,e,c,dir)=>{const av=availOf(l,c),i=l.steps.indexOf(e);return dir>0?av.find(x=>l.steps.indexOf(x)>i):[...av].reverse().find(x=>l.steps.indexOf(x)<i)};
 const PAIN=[["neck","Neck"],["shoulder","Shoulder"],["back","Back"],["hip","Hip"],["knee","Knee"],["ankle","Ankle / foot"],["wrist","Wrist / elbow"]];
-const EQ=[["db","Dumbbells"],["band","Band"],["kb","Kettlebell"],["bench","Bench or box"],["bb","Barbell"],["hex","Hex bar"],["bar","Pull-up bar or rig"]],TIMES=[15,30,45,60];
+const EQ=[["db","Dumbbells"],["band","Band"],["kb","Kettlebell"],["bench","Bench or box"],["bb","Barbell"],["hex","Hex bar"],["cable","Cable column"],["bar","Pull-up bar or rig"]],TIMES=[15,30,45,60];
 const fresh=()=>({days:{},prog:{},lad:{},wt:{},owner:null,set:{equip:[],time:30,level:"beg",units:"lb"}});
 const DKEY=/^\d{4}-\d{2}-\d{2}$/,BADC=/[<>"`]/g;
 function scrub(v,d){if(d>9)return null;if(typeof v==="string")return v.slice(0,400).replace(BADC,"");if(typeof v==="number")return isFinite(v)?v:0;if(typeof v==="boolean"||v===null)return v;if(Array.isArray(v))return v.slice(0,500).map(i=>scrub(i,d+1));if(typeof v==="object"){const o={};let n=0;for(const k of Object.keys(v)){if(k==="__proto__"||k==="constructor"||k==="prototype"||++n>3000)continue;o[k.replace(BADC,"")]=scrub(v[k],d+1)}return o}return null}
 function clean(x){try{if(!x||typeof x!=="object"||Array.isArray(x)||!x.days||typeof x.days!=="object"||Array.isArray(x.days))return null;if(JSON.stringify(x).length>1500000)return null;const o=scrub(x,0),f=fresh();for(const k of Object.keys(o.days))if(!DKEY.test(k)||!o.days[k]||typeof o.days[k]!=="object")delete o.days[k];
  for(const k of["prog","lad","wt"])if(!o[k]||typeof o[k]!=="object"||Array.isArray(o[k]))o[k]={};
- const t=o.set&&typeof o.set==="object"&&!Array.isArray(o.set)?o.set:{},ids=EQ.map(e=>e[0]);o.set={...f.set,...t};o.set.units=o.set.units==="kg"?"kg":"lb";o.set.time=TIMES.includes(+o.set.time)?+o.set.time:30;o.set.equip=Array.isArray(o.set.equip)?o.set.equip.filter(q=>ids.includes(q)):[];
+ const t=o.set&&typeof o.set==="object"&&!Array.isArray(o.set)?o.set:{},ids=EQ.map(e=>e[0]);o.set={...f.set,...t};o.set.units=o.set.units==="kg"?"kg":"lb";o.set.time=TIMES.includes(+o.set.time)?+o.set.time:30;o.set.equip=Array.isArray(o.set.equip)?o.set.equip.filter(q=>ids.includes(q)):[];if(!(o.bw>=20&&o.bw<=400))delete o.bw;
  if(o.owner!=null&&typeof o.owner!=="string")o.owner=null;return o}catch(e){return null}}
 function trimS(){let js=JSON.stringify(S);if(js.length<=900000)return;const ks=Object.keys(S.days).sort();while(ks.length>30&&js.length>900000){delete S.days[ks.shift()];js=JSON.stringify(S)}}
 function load(){try{const s=clean(JSON.parse(localStorage.getItem(KEY)));return s?{...fresh(),...s}:fresh()}catch(e){return fresh()}}
@@ -295,34 +446,58 @@ const lastFin=k=>{let m="";for(const x in S.days){if(x<k&&S.days[x].fin&&x>m)m=x
 function awayAdj(k){const lf=lastFin(k);if(!lf||S.gap===k)return;const gap=Math.round((Date.parse(k)-Date.parse(lf))/864e5);if(gap<10)return;for(const n in S.prog){const e=ex(n);S.prog[n].t=Math.max(e?e.lo:5,S.prog[n].t-2)}S.gap=k;S.gapDays=gap}
 const focusFor=(k,c)=>{const up=c.pain.some(x=>["neck","shoulder","wrist"].includes(x)),lo=c.pain.some(x=>["hip","knee","ankle"].includes(x));return up&&!lo?"lower":lo&&!up?"upper":focusOf(k)};
 function tgt(n){const e=ex(n);return(S.prog[n]&&S.prog[n].t)||(e?e.lo:8)}
-function pool(p,c,used){return EX.filter(e=>!e.lad&&e.pat===p&&!used.has(e.name)&&eqOK(e,c)&&painOK(e,c)).sort((a,b)=>lastDone(a.name).localeCompare(lastDone(b.name)))}
-function mainStep(l,c,low){
+/* ===== Intensity pairing rules ===== */
+const BANDS=[3,5,7,9],AVGCAP=[3,3,5,6],sOf=n=>{const e=ex(n);return e?e.sc:5};
+function dayAvg(d){const lg=d.log||{},any=Object.keys(lg).length,a=(d.plan||[]).filter(p=>{const e=ex(p.n);return e&&e.pat!=="mob"&&(!any||(lg[p.n]&&lg[p.n].done))}).map(p=>e_sc(p.n));return a.length?a.reduce((x,y)=>x+y,0)/a.length:0}
+function e_sc(n){return sOf(n)}
+function rulesCtx(k,c){const tier=meta(c).tier,fins=Object.keys(S.days).filter(x=>x<k&&S.days[x].fin).sort().reverse(),day=x=>Math.round((Date.parse(k)-Date.parse(x))/864e5),
+ gap=fins.length?day(fins[0]):99,y=fins.length&&gap<=2?S.days[fins[0]]:null,yAvg=y?dayAvg(y):0,feel=y&&y.fin?feelOf(y.fin):null,
+ hard3=fins.length>=3&&fins.slice(0,3).every(x=>dayAvg(S.days[x])>=5.5)&&day(fins[2])<=5,away=fins.length>0&&gap>=10,calm=(+c.stress>=8)||(c.pain||[]).length>0;
+ let i={low:1,mod:2,high:3}[tier],allow8=1;
+ if(yAvg>=5.5)i--;if(feel!=null&&feel<=2)i--;if(feel!=null&&feel>=9&&tier==="high")allow8=2;
+ if(hard3||away||calm)i=Math.min(i,1);i=Math.max(0,i);
+ return{cap:BANDS[i],avg:AVGCAP[i],allow8,noImp:tier==="low"||calm,i,why:{yAvg,feel,hard3,away,calm,tier}}}
+function pool(p,c,used,lim){let l=EX.filter(e=>!e.lad&&e.pat===p&&!used.has(e.name)&&eqOK(e,c)&&painOK(e,c));
+ if(lim){let f=l.filter(e=>e.sc<=lim.cap&&(!lim.noImp||!e.imp)&&(!lim.prevImp||!e.imp)&&(lim.min==null||e.sc>=lim.min));
+  l=f}
+ return l.sort((a,b)=>lastDone(a.name).localeCompare(lastDone(b.name)))}
+function mainStep(l,c,low,cap){
  const av=availOf(l,c);if(!av.length)return null;
  const cur=S.lad[l.id],ci=cur?l.steps.findIndex(e=>e.name===cur):-1;let k=0;
  if(ci<0){k=Math.floor(({beg:0,int:.34,adv:.67}[c.level||S.set.level||"beg"]||0)*(av.length-1))}
  else{k=-1;av.forEach((e,i)=>{if(l.steps.indexOf(e)<=ci)k=i});if(k<0)k=0}
  if(low)k=Math.max(0,k-1);
+ if(cap!=null)while(k>0&&av[k].sc>cap)k--;
  return{e:av[k],k,av};
 }
 function build(k,c,salt,o){o=o||{};
- const r=rng(k+"|"+salt),{tier}=meta(c),f=o.focus||focusFor(k,c),low=tier==="low",TM=o.time||c.time;
- const seqs={lower:["mob","squat","hinge","core","squat","hinge","mob"],upper:["mob","push","pull","vpull","core","push","pull","mob"],full:["mob","squat","push","hinge","pull","vpull","core","mob"],mob:["mob","core","mob","core","mob","core","mob","mob"]};
+ const r=rng(k+"|"+salt),{tier}=meta(c),f=o.focus||focusFor(k,c),low=tier==="low",TM=o.time||c.time,R=rulesCtx(k,c);
+ const seqs={lower:["mob","squat","hinge","core","squat","hinge","mob"],upper:["mob","push","pull","vpull","core","push","pull","mob"],full:["mob","squat","push","hinge","pull","vpull","core","mob"],mob:["mob","core","mob","core","mob","core","mob","mob"],cond:["mob","cond","cond","cond","cond","core","cond","cond"]};
  const seq=low&&f!=="mob"?["mob","core","mob","hinge","mob","pull","core"]:seqs[f];
- const sets=low?2:TM>=45?4:3,used=new Set(),uses={},plan=[];let mins=0;
+ const sets=low?2:TM>=45?4:3,used=new Set(),uses={},plan=[],finish=!o.bonus&&!low&&TM>=30&&c.sleep>=9&&c.energy>=9&&c.stress<=2&&["lower","upper","full"].includes(f),budget=finish?TM-4:TM;let mins=0;
+ const prev=()=>plan.length?ex(plan[plan.length-1].n):null,lim=(x)=>{const q=prev();return{cap:q&&q.sc>=8?Math.min(R.cap,7):R.cap,noImp:R.noImp,prevImp:!!(q&&q.imp),...x}};
  for(let i=0;i<20&&plan.length<10;i++){
   const p=seq[i%seq.length],est=p==="mob"?2:sets*1.7;
-  if(mins+est>TM&&plan.length>=3)break;
+  if(mins+est>budget&&plan.length>=3)break;
   let pick=null;
   const ls=LADS.filter(l=>l.ladder&&l.pat===p).sort((a,b)=>(uses[a.id]||0)-(uses[b.id]||0));
   if(ls.length){
-   for(const l of ls){const n=uses[l.id]||0;if(n>=2)continue;const m=mainStep(l,c,low);if(!m)continue;
-    if(n===0&&!used.has(m.e.name))pick={e:m.e,l:l.id,main:!low};
+   const q=prev(),cp=q&&q.sc>=8?Math.min(R.cap,7):R.cap;
+   for(const l of ls){const n=uses[l.id]||0;if(n>=2)continue;const m=mainStep(l,c,low,cp);if(!m)continue;
+    if(n===0&&!used.has(m.e.name))pick={e:m.e,l:l.id,main:!low&&m.e.sc===mainStep(l,c,low).e.sc};
     else if(n===1){const e=m.av[m.k-1];if(e&&!used.has(e.name))pick={e,l:l.id,main:false}}
     if(pick){uses[l.id]=n+1;break}}
-  }else{const pl=pool(p,c,used);if(pl.length)pick={e:pl[Math.floor(r()*Math.min(3,pl.length))]}}
+  }else{const pl=pool(p,c,used,lim());if(pl.length)pick={e:pl[Math.floor(r()*Math.min(3,pl.length))]}}
   if(!pick)continue;
-  used.add(pick.e.name);mins+=est;plan.push({n:pick.e.name,sets:p==="mob"?1:sets,l:pick.l||null,m:!!pick.main});
+  const one=isSteady(pick.e);used.add(pick.e.name);mins+=one?8:est;plan.push({n:pick.e.name,sets:p==="mob"?1:one?1:sets,l:pick.l||null,m:!!pick.main});
+  if(pick.e.sc>=7&&pick.e.pat!=="cond"&&mins+sets*1.7<=budget){const cm=pool("core",c,used,{cap:3,noImp:true,prevImp:false}).filter(e=>e.sc<=3);if(cm.length){const e=cm[Math.floor(r()*Math.min(3,cm.length))];used.add(e.name);mins+=sets*1.7;plan.push({n:e.name,sets,l:null,m:false})}}
  }
+ if(finish){const used2=new Set(plan.filter(p=>{const e=ex(p.n);return e&&e.pat!=="mob"}).flatMap(p=>ex(p.n).jt)),all=pool("cond",c,used,{cap:Math.min(8,R.cap),noImp:R.noImp,prevImp:false,min:5}).filter(e=>!isSteady(e)),fp=all.filter(e=>!e.jt.some(j=>used2.has(j)));const L2=fp.length?fp:all;if(L2.length){const e=L2[Math.floor(r()*Math.min(3,L2.length))];plan.push({n:e.name,sets:2,l:null,m:false,fin:1})}}
+ /* tune: trim the hardest ladder moves until the session fits the average and the 8+ limit */
+ for(let g=0;g<12;g++){const sc=plan.map(p=>sOf(p.n)),avg=sc.reduce((a,b)=>a+b,0)/Math.max(1,sc.length),n8=sc.filter(x=>x>=8).length;if(avg<=R.avg&&n8<=R.allow8)break;
+  let best=-1,bs=-1,nx=null;plan.forEach((p,i)=>{if(!p.l||p.fin)return;const L=LADS.find(x=>x.id===p.l),e=ex(p.n),av=L?availOf(L,c):[];let st=null;for(let j=av.indexOf(e)-1;j>=0;j--){if(av[j].sc<e.sc&&!plan.some(q=>q.n===av[j].name)){st=av[j];break}}if(st&&e.sc>bs){bs=e.sc;best=i;nx=st}});
+  if(best<0){plan.forEach((p,i)=>{const e=ex(p.n);if(p.l||p.fin||!e||e.pat==="mob"||e.sc<=2)return;if(e.sc>bs){const nm=new Set(plan.map(q=>q.n)),alt=pool(e.pat,c,nm,{cap:e.sc-1,noImp:R.noImp,prevImp:false});if(alt.length){bs=e.sc;best=i;nx=alt[0]}}});if(best<0)break}
+  plan[best].n=nx.name;plan[best].m=false}
  if(!plan.length)plan.push({n:"90/90 Breathing",sets:1,l:null,m:false});
  if(o.bonus)plan.forEach(p=>{p.m=false});
  return plan;
@@ -344,13 +519,13 @@ function formV(){if(!F)initF();
  ${Object.keys(S.lad).length?"":`<h3>Your training level</h3><p class="muted">Sets your starting point on each movement. After that, the app moves you up on its own.</p><div class="chips">${[["beg","Beginner"],["int","Intermediate"],["adv","Advanced"]].map(([v,l])=>chip("level",v,l,F.level===v)).join("")}</div>`}
  <label style="display:flex;gap:10px;align-items:flex-start;margin-top:8px"><input type="checkbox" data-a="red" ${F.red?"checked":""}><span>I have sharp or worsening pain, numbness, chest pain or dizziness.</span></label>`+nav(true,true);
  return`<section class="card">${b}</section>`}
-function rowsHTML(wk,wi){const bn=wi!=="",u=isKg()?"kg":"lb";return wk.plan.map((p,i)=>{const e=ex(p.n),l=wk.log[p.n]||{},t=tgt(p.n),rx=e.unit==="m"?`${t} slow reps`:`${p.sets} × ${t} ${UL[e.unit]}`,L=p.l&&LADS.find(x=>x.id===p.l),lv=L?`<small class="lv">Step ${L.steps.indexOf(e)+1} of ${L.steps.length} · ${tierOf(L,e)}${p.m||bn?"":" · lighter option"}</small>`:"",w=`data-w="${wi}"`;
+function rowsHTML(wk,wi){const bn=wi!=="",u=isKg()?"kg":"lb";return wk.plan.map((p,i)=>{const e=ex(p.n),l=wk.log[p.n]||{},t=tgt(p.n),rx=e.unit==="m"?`${t} slow reps`:isSteady(e)?`${fmt(t/60)} min at an easy pace`:`${p.sets} × ${t} ${UL[e.unit]}`,L=p.l&&LADS.find(x=>x.id===p.l),lv=p.fin?`<small class="lv">Conditioning finisher</small>`:L?`<small class="lv">Step ${L.steps.indexOf(e)+1} of ${L.steps.length} · ${tierOf(L,e)}${p.m||bn?"":" · lighter option"}</small>`:"",w=`data-w="${wi}"`;
   const ws=e.load?(wk.fin?(l.kg?`<small class="wsug">Logged ${fmt(toU(l.kg))} ${u}${l.a?` × ${l.a}`:""}</small>`:""):wtSuggestHTML(e,t)):"";
   const wInp=e.load&&!wk.fin?`<input class="w" type="number" min="0" max="2000" step="any" inputmode="decimal" placeholder="${u}" title="Weight used" value="${l.kg?fmt(toU(l.kg)):""}" data-a="wt" data-i="${i}" ${w} aria-label="Weight used for ${e.name} in ${u==="kg"?"kilograms":"pounds"}">`:"";
   return`<div class="ex ${l.done?"on":""}"><button class="tick" data-a="tick" data-i="${i}" ${w} aria-pressed="${!!l.done}" aria-label="Mark ${e.name} done" ${wk.fin?"disabled":""}>✓</button><div><strong><button class="nm" data-a="video" data-i="${i}" ${w} aria-label="Watch ${e.name} demo">${e.name} <i aria-hidden="true">▶</i></button></strong><span>${e.cue}</span><em>${rx}</em>${lv}${ws}</div>
-  <div class="exr">${wInp}${e.unit==="m"||wk.fin?"":`<input type="number" min="0" max="300" inputmode="numeric" placeholder="${t}" title="Reps or seconds" value="${l.a||""}" data-a="num" data-i="${i}" ${w} aria-label="Best set for ${e.name}">`}${wk.fin?"":`<button data-a="timer" data-i="${i}" ${w} aria-label="Timer for ${e.name}">⏱</button>`}${wk.fin?"":`<button data-a="swap" data-i="${i}" ${w} aria-label="Swap ${e.name}">↻</button>`}</div></div>`}).join("")}
+  <div class="exr">${wInp}${e.unit==="m"||wk.fin?"":`<input type="number" min="0" max="1800" inputmode="numeric" placeholder="${t}" title="Reps or seconds" value="${l.a||""}" data-a="num" data-i="${i}" ${w} aria-label="Best set for ${e.name}">`}${wk.fin?"":`<button data-a="timer" data-i="${i}" ${w} aria-label="Timer for ${e.name}">⏱</button>`}${wk.fin?"":`<button data-a="swap" data-i="${i}" ${w} aria-label="Swap ${e.name}">↻</button>`}</div></div>`}).join("")}
 const feelOf=f=>f.feel!=null?f.feel:Math.min(10,Math.max(1,11-f.rpe));
-const PTS_MAIN=10,PTS_BONUS=15,BLAB={lower:"Lower body",upper:"Upper body",full:"Full body",mob:"Mobility & core"};
+const PTS_MAIN=10,PTS_BONUS=15,BLAB={lower:"Lower body",upper:"Upper body",full:"Full body",mob:"Mobility & core",cond:"Conditioning"};
 let BF=null;
 const bonusDone=d=>(d.bonus||[]).filter(b=>b.fin);
 function points(){let p=0,bw=0,mw=0;for(const k in S.days){const d=S.days[k];if(d.fin){p+=PTS_MAIN;mw++}const n=bonusDone(d).length;bw+=n;p+=n*PTS_BONUS}return{p,bw,mw}}
@@ -413,7 +588,7 @@ function openTimer(name,e,t,opener){tmOpener=opener;const holds=e.unit==="s"||e.
 function tmSettings(){const T=TM,ch=(a,v,l,on)=>`<button class="chip" data-a="${a}" data-v="${v}" aria-pressed="${on}">${l}</button>`;
  let h=`<div class="chips">${ch("tmmode","pace","Rep pacer",T.mode==="pace")}${ch("tmmode","hold","Hold",T.mode==="hold")}${ch("tmmode","rest","Rest",T.mode==="rest")}</div>`;
  if(T.mode==="pace")h+=`<p class="muted" style="margin:10px 0 4px">Reps</p><input class="tmi" id="tmreps" type="number" min="1" max="60" value="${T.reps}" aria-label="Number of reps"><p class="muted" style="margin:10px 0 4px">Seconds per rep (a beep marks each rep)</p><div class="chips">${[2,3,4,5,6].map(v=>ch("tmper",v,v+"s",T.per===v)).join("")}</div>`;
- else if(T.mode==="hold")h+=`<p class="muted" style="margin:10px 0 4px">Hold for (seconds)</p><input class="tmi" id="tmsecs" type="number" min="5" max="300" value="${T.secs}" aria-label="Hold length in seconds">`;
+ else if(T.mode==="hold")h+=`<p class="muted" style="margin:10px 0 4px">Hold for (seconds)</p><input class="tmi" id="tmsecs" type="number" min="5" max="1800" value="${T.secs}" aria-label="Hold length in seconds">`;
  else h+=`<p class="muted" style="margin:10px 0 4px">Rest for</p><div class="chips">${[30,45,60,90,120].map(v=>ch("tmrest",v,v+"s",T.rest===v)).join("")}</div>`;
  if(T.mode!=="rest")h+=`<div class="chips" style="margin-top:10px">${ch("tmsides","x","Do both sides",T.sides)}</div>`;
  $("#tmset").innerHTML=h}
@@ -442,7 +617,7 @@ function tmTick(){const T=TM;if(!T||!T.run)return;T.left=T.end-Date.now();const 
   T.left=T.phases[T.pi].s*1000;T.end=Date.now()+T.left;T.lastSec=null;tmEnter()}
  tmDraw()}
 function closeTimer(){tmStop();if(TM){TM.run=false}TM=null;$("#tm").hidden=true;document.body.style.overflow="";if(tmOpener&&tmOpener.focus)try{tmOpener.focus()}catch(e){}}
-addEventListener("change",e=>{const t=e.target;if(!TM)return;if(t.id==="tmreps"){TM.reps=Math.min(60,Math.max(1,+t.value||8));tmReset()}else if(t.id==="tmsecs"){TM.secs=Math.min(300,Math.max(5,+t.value||30));tmReset()}});
+addEventListener("change",e=>{const t=e.target;if(t.classList&&t.classList.contains("rm")){setRM(t.dataset.n,parseFloat(t.value));render();return}if(t.id==="bwi"){setBW(parseFloat(t.value));render();return}if(!TM)return;if(t.id==="tmreps"){TM.reps=Math.min(60,Math.max(1,+t.value||8));tmReset()}else if(t.id==="tmsecs"){TM.secs=Math.min(1800,Math.max(5,+t.value||30));tmReset()}});
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&TM&&TM.run){wake()}});
 /* ===== Day detail ===== */
 function dayHTML(k){const d=S.days[k];if(!d)return"<p class=\"muted\">No data for that day.</p>";const u=isKg()?"kg":"lb";
@@ -466,8 +641,14 @@ function progV(){
  const avg=sc.length?Math.round(sc.slice(-7).reduce((a,b)=>a+b,0)/Math.min(7,sc.length)):"–";
  const heat=[...Array(28)].map((_,i)=>{const d=new Date();d.setDate(d.getDate()-(27-i));const k=key(d),x=S.days[k];return`<i class="${x&&x.fin?"f":x&&x.ck?"p":""}" title="${k}"></i>`}).join("");
  const hist=fin.slice(-14).reverse().map(k=>`<button class="row dayb" data-a="day" data-k="${k}" aria-label="See the workout from ${k}"><span>${k}</span><span>${meta(S.days[k].ck).score} readiness · felt ${feelOf(S.days[k].fin)}/10${bonusDone(S.days[k]).length?` · +${bonusDone(S.days[k]).length} bonus`:""} ›</span></button>`).join("")||`<p class="muted">Finish a workout to start your log.</p>`;
- const u3=isKg()?"kg":"lb",names=[...new Set([...Object.keys(S.wt||{}),...Object.keys(S.prog)])].filter(n=>ex(n)&&ex(n).load),
-  pr=names.map(n=>({n,c:wtInfo(n).cur})).sort((x,y)=>(y.c?1:0)-(x.c?1:0)||(y.c||0)-(x.c||0)).slice(0,14).map(({n,c})=>`<div class="row"><span>${n}</span><b>${c?fmt(sugW(c,3))+" "+u3:"–"}</b></div>`).join("")||`<p class="muted">Log the weight and reps next to a loaded exercise in your workout and your 3RM recommendation appears here.</p>`;
+ const u3=isKg()?"kg":"lb",eqs={equip:S.set.equip||[]},rmEx=EX.filter(e=>e.load&&!isHold(e)&&["push","pull","vpull","hinge","squat"].includes(e.pat)&&R3[e.name]!=null),
+  rmRow=e=>{const i=wtInfo(e.name),man=i.man,st=startRM(e),rec=i.cur?sugW(i.cur,3):st?sugW(st/(pct(3)/100),3):null,val=man&&i.cur===man.e?fmt(toU(man.kg)):rec!=null?fmt(rec):"",src=man?"you entered this":i.cur?"from your logged sets":st?"starting estimate":"add body weight for an estimate";
+   return`<div class="row"><label for="rm-${esc(e.name)}">${esc(e.name)}<br><small class="muted">${src}</small></label><span class="exr"><input class="rm" id="rm-${esc(e.name)}" type="number" min="0" max="2000" step="any" inputmode="decimal" placeholder="${u3}" value="${val}" data-n="${esc(e.name)}" aria-label="3RM for ${esc(e.name)} in ${u3==="kg"?"kilograms":"pounds"}"><small class="muted">${u3}</small></span></div>`},
+  mine=rmEx.filter(e=>eqOK(e,eqs)),rest=rmEx.filter(e=>!eqOK(e,eqs)),
+  pr=`<p class="muted">Your 3RM is the heaviest weight you can lift for 3 good reps. Type yours and every weight suggestion in your workouts is set from it. Clear a box to let the app work it out from your logged sets again. Without a number, we show a starting estimate from your body weight.</p>
+  <div class="row"><label for="bwi">Body weight (${u3})<br><small class="muted">Optional. Used only for starting estimates.</small></label><span class="exr"><input id="bwi" type="number" min="0" max="900" step="any" inputmode="decimal" placeholder="${u3}" value="${S.bw>0?fmt(toU(S.bw)):""}" aria-label="Body weight in ${u3==="kg"?"kilograms":"pounds"}"><small class="muted">${u3}</small></span></div>
+  ${mine.map(rmRow).join("")||`<p class="muted">Pick your equipment in the daily check-in to see your lifts here.</p>`}${rest.length?`<details><summary>Lifts that need other equipment</summary>${rest.map(rmRow).join("")}</details>`:""}
+  <p class="muted">Use ONE dumbbell or kettlebell weight. For barbells and the hex bar, include the bar. Starting estimates are general, so start lighter if unsure. Warm up first and use a spotter or safety arms for heavy barbell work.</p>`;
  const fk=cks.slice(-14),av=f=>fk.length?(fk.slice(-7).reduce((a,k)=>a+(+S.days[k].ck[f]||0),0)/Math.min(7,fk.length)).toFixed(1):"–";
  const feel=fk.length?`<div class="stats" style="grid-template-columns:repeat(3,1fr)"><div class="stat"><b>${av("sleep")}</b><span>Sleep</span></div><div class="stat"><b>${av("energy")}</b><span>Energy</span></div><div class="stat"><b>${av("stress")}</b><span>Stress</span></div></div>`
   +lines([{c:"var(--ok)",d:"0",v:fk.map(k=>+S.days[k].ck.sleep)},{c:"var(--red)",d:"7 5",v:fk.map(k=>+S.days[k].ck.energy)},{c:"var(--mu)",d:"2 5",v:fk.map(k=>+S.days[k].ck.stress)}])
@@ -477,8 +658,8 @@ function progV(){
  const lv=LADS.filter(l=>l.ladder).map(l=>{const i=S.lad[l.id]?l.steps.findIndex(e=>e.name===S.lad[l.id]):-1;if(i<0)return"";const n=l.steps.length;return`<div class="row"><span>${l.title}<br><small class="muted">${l.steps[i].name} · ${tierOf(l,l.steps[i])}</small></span><b>${i+1}/${n}</b></div><div class="bar"><i style="width:${Math.round((i+1)/n*100)}%"></i></div>`}).join("")||`<p class="muted">Your levels show up after your first finished workout.</p>`;
  return quoteCard(today()+"p"+fin.length)+`<section class="card"><div class="stats"><div class="stat"><b>${streak()}</b><span>Day streak</span></div><div class="stat"><b>${wk}</b><span>This week</span></div><div class="stat"><b>${fin.length}</b><span>Total</span></div><div class="stat"><b>${avg}</b><span>Avg ready</span></div></div></section>
  <section class="card"><h3>Points</h3><div class="stats" style="grid-template-columns:repeat(3,1fr)"><div class="stat"><b>${pts.p}</b><span>Points</span></div><div class="stat"><b>${pts.bw}</b><span>Bonus workouts</span></div><div class="stat"><b>${pts.mw+pts.bw}</b><span>All workouts</span></div></div><p class="muted">${PTS_MAIN} points for each daily mission, ${PTS_BONUS} bonus points for each bonus workout.</p></section><section class="card"><h3>How you’ve felt</h3>${feel}</section><section class="card"><h3>Readiness trend</h3>${spark(sc)}</section><section class="card"><h3>Last 28 days</h3><div class="heat">${heat}</div><p class="muted">Green = finished, tinted = checked in.</p></section>
- <section class="card"><h3>Your levels</h3>${lv}</section>${wcard}<section class="card"><h3>3RM recommendations</h3><p class="muted">93% of your estimated one-rep max: a heavy set of 3 reps. Rounded to the nearest ${isKg()?"2.5 kg":"5 lb"}. Warm up first and use a spotter.</p>${pr}</section><section class="card"><h3>Recent workouts</h3><p class="muted">Tap a day to see what you did.</p>${hist}</section>
- <section class="card"><h3>Backup</h3><p class="muted">Your data is saved in this browser, and also synced to your account if you sign in. Copy the backup text somewhere safe, or paste one here to restore it (restoring replaces what is on this device).</p><textarea id="bk" aria-label="Backup data"></textarea><button class="btn ghost" data-a="bkshow">Show backup</button> <button class="btn ghost" data-a="bkload">Restore</button></section>`}
+ <section class="card"><h3>Your levels</h3>${lv}</section>${wcard}<section class="card"><h3>Your 3RM</h3>${pr}</section><section class="card"><h3>Recent workouts</h3><p class="muted">Tap a day to see what you did.</p>${hist}</section>
+ `}
 function render(){const sbt=$("#sub");if(sbt)sbt.textContent=user?"Signed in · "+user.email:"Daily Mission";const wb=$("#who");if(wb){wb.hidden=!(user||!sb||authReady);wb.className=user?"chip":"btn hb";wb.textContent=user?"Sign out":"Sign in";wb.setAttribute("data-a",user?"logout":"gosign");wb.setAttribute("aria-label",user?"Sign out of "+user.email:"Sign in")}
 document.querySelectorAll("nav button").forEach(b=>{const on=b.dataset.v===view;b.classList.toggle("on",on);b.setAttribute("aria-selected",on)});$("#app").innerHTML=(view==="today"?installTip():"")+(view==="signin"?signinV():view==="today"?todayV():progV())+(view==="signin"||(view==="today"&&user)?"":accV())}
 function finish(wi){const k=today(),d=S.days[k],bn=wi!==undefined&&wi!=="",wk=bn?d.bonus[+wi]:d,feel=Math.min(10,Math.max(1,+$("#rpe").value||6)),rpe=11-feel,up=[];
@@ -488,7 +669,7 @@ function finish(wi){const k=today(),d=S.days[k],bn=wi!==undefined&&wi!=="",wk=bn
  const low=meta(d.ck).tier==="low";
  if(low)up.push("Recovery day: targets held, no level changes.");
  else d.plan.forEach(p=>{const l=d.log[p.n];if(!l||!l.done)return;const e=ex(p.n);if(!e||e.unit==="m")return;
-  const L=p.l&&LADS.find(x=>x.id===p.l),t=tgt(p.n),a=+l.a||0,entered=a>0,hit=entered?a>=t:true,st=(e.unit==="s"||e.unit==="ss")?5:1;
+  const L=p.l&&LADS.find(x=>x.id===p.l),t=tgt(p.n),a=+l.a||0,entered=a>0,hit=entered?a>=t:true,st=isSteady(e)?30:(e.unit==="s"||e.unit==="ss")?5:1;
   if(L&&p.m&&!S.lad[L.id])S.lad[L.id]=e.name;
   if(hit&&rpe<=8){
    if(t<e.hi){const nt=Math.min(e.hi,t+st);S.prog[p.n]={t:nt};up.push(`${p.n}: next target ${nt} ${UL[e.unit]}`)}
@@ -543,8 +724,6 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b
  else if(a==="otpback"){otpEmail=null}
  else if(a==="gosign"){view="signin";try{scrollTo(0,0)}catch(e){}}
  else if(a==="delask"){delAsk=true;delDone=false;render();return}else if(a==="delno"){delAsk=false;render();return}else if(a==="delgo"){delAcct(b);return}else if(a==="logout"){logout(b);return}
- else if(a==="bkshow"){$("#bk").value=JSON.stringify(S);return}
- else if(a==="bkload"){try{const x=clean(JSON.parse($("#bk").value));if(x){S={...fresh(),...x};save()}else{$("#bk").value="Could not read that backup.";return}}catch(err){$("#bk").value="Could not read that backup.";return}}
  render()});
 document.addEventListener("input",e=>{const t=e.target,a=t.dataset.a;if(!a)return;
  if(a==="rng"){F[t.dataset.k]=+t.value;$("#v-"+t.dataset.k).textContent=t.value}
@@ -567,7 +746,7 @@ async function login(){const em=$("#em").value.trim(),m=$("#am");if(!em){m.textC
 async function verify(){const code=($("#otp").value||"").replace(/\s/g,""),m=$("#am");if(!code){m.textContent="Type the code from the email.";return}m.textContent="Checking…";
  for(const type of["email","magiclink","signup"]){const r=await sb.auth.verifyOtp({email:otpEmail,token:code,type});if(!r.error){otpEmail=null;return}}
  m.textContent="That code didn’t work. Check it and try again, or go back and request a new one."}
-function mergeS(a,b){const m={...fresh(),...a,days:{...b.days,...a.days},prog:{...a.prog},lad:{...(b.lad||{}),...(a.lad||{})},wt:mergeWt(a.wt,b.wt)};for(const k in b.days){const x=a.days[k],y=b.days[k];if(x&&y&&((y.fin&&!x.fin)||bonusDone(y).length>bonusDone(x).length))m.days[k]=y}for(const n in(b.prog||{})){if(!m.prog[n]||b.prog[n].t>m.prog[n].t)m.prog[n]=b.prog[n]}for(const id in(b.lad||{})){const L=LADS.find(x=>x.id===id),ai=L?L.steps.findIndex(e=>e.name===(a.lad||{})[id]):-1,bi=L?L.steps.findIndex(e=>e.name===b.lad[id]):-1;if(bi>ai)m.lad[id]=b.lad[id]}return m}
+function mergeS(a,b){const m={...fresh(),...a,days:{...b.days,...a.days},prog:{...a.prog},lad:{...(b.lad||{}),...(a.lad||{})},wt:mergeWt(a.wt,b.wt)};for(const k in b.days){const x=a.days[k],y=b.days[k];if(x&&y&&((y.fin&&!x.fin)||bonusDone(y).length>bonusDone(x).length))m.days[k]=y}for(const n in(b.prog||{})){if(!m.prog[n]||b.prog[n].t>m.prog[n].t)m.prog[n]=b.prog[n]}for(const id in(b.lad||{})){const L=LADS.find(x=>x.id===id),ai=L?L.steps.findIndex(e=>e.name===(a.lad||{})[id]):-1,bi=L?L.steps.findIndex(e=>e.name===b.lad[id]):-1;if(bi>ai)m.lad[id]=b.lad[id]}if(!(m.bw>0)&&b.bw>0)m.bw=b.bw;return m}
 async function pull(quiet){if(!sb||!user)return;const uid=user.id,before=quiet?JSON.stringify(S):null;let ok=false;try{
  const r=await sb.from("progress").select("data").eq("user_id",uid).maybeSingle();if(r.error)throw r.error;if(!user||user.id!==uid)return;
  const cloud=clean(r.data&&r.data.data);
