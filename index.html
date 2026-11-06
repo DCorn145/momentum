@@ -91,6 +91,7 @@ nav button.on,.chip[aria-pressed=true],.sc button[aria-pressed=true],.btn{backgr
 .tick,.exr button,.vx{width:44px;height:44px}
 .chip,nav button,.hb,.btn,.inst .x{min-height:44px}.inst .x{min-width:44px}
 .exr input{min-height:44px}.nm{padding:8px 0}
+.anch{list-style:none;margin:14px 0 0;padding:0;font-size:14px;color:var(--mu)}.anch li{padding:3px 0}.wch{margin-top:14px;border:1px solid var(--ln);border-radius:12px;padding:10px 12px}.wch summary{cursor:pointer;font-weight:700;min-height:28px}.wch input{width:100%;padding:12px;border-radius:10px;border:1px solid var(--ln);background:var(--sf2);color:var(--tx);margin-top:8px}.cons{font-size:14px;color:var(--mu)}.cons a{color:var(--red);font-weight:700}.cons{display:flex;gap:10px;align-items:flex-start;margin:10px 0;line-height:1.35}.cons input{width:22px;height:22px;flex:none;margin-top:2px}
 .lnk{background:none;border:0;padding:6px 0;color:var(--red);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer;min-height:44px}.rm,#bwi{width:90px}
 .fine a{color:inherit;display:inline-block;padding:12px 8px;font-weight:600}
 </style>
@@ -132,9 +133,9 @@ const LIB=`
 Wall Push-Up | bw | shoulder,wrist | r | Hands on a wall, body in one line, chest to the wall. | 10-15 |  | 2
 Incline Push-Up | bw | shoulder,wrist | r | Hands on a bench or wall, body long, elbows controlled. |  |  | 3
 Knee Push-Up | bw | shoulder,wrist | r | Knees down, body in one line from knees to head. | 8-12 |  | 3
-Push-Up Plus | bw | shoulder,wrist | r | At the top, push the floor away and spread the shoulder blades. | 8-12 |  | 3
 Standing Cable Chest Press | cable | shoulder,wrist | r | Split stance, press forward without shrugging. | 10-15 |  | 3
 Cable Chest Fly | cable | shoulder | r | Soft elbows. Hug a big tree and squeeze at the front. | 10-15 |  | 3
+Push-Up Plus | bw | shoulder,wrist | r | At the top, push the floor away and spread the shoulder blades. | 8-12 |  | 3
 Push-Up | bw | shoulder,wrist | r | One straight line from head to heels, chest to a fist above the floor. |  |  | 4
 DB Floor Press | db | shoulder,wrist | r | Elbows about 45 degrees, light pause on the floor. |  |  | 4
 Neutral-Grip DB Floor Press | db | shoulder,wrist | r | Palms face each other, elbows about 45 degrees. | 8-12 |  | 4
@@ -251,8 +252,8 @@ Cable Reverse Lunge | cable | knee,hip,ankle | rs | Hold the handle at the chest
 Lateral Step-Down | bench | knee,hip,ankle | rs | Slowly lower the heel to the floor, knee tracking over the toes. | 6-10 |  | 5
 Cossack Squat | bw | knee,hip,ankle | rs | Wide stance, sink into one side, keep the heel down. | 5-8 |  | 5
 Walking Lunge | bw | knee,hip,ankle | rs | Long steps, torso tall. | 8-12 |  | 5
-Tempo Goblet Squat | db,kb | knee,hip,ankle | r | Lower for 3 seconds, pause, stand up. | 6-10 |  | 5
 Goblet Squat | db,kb | knee,hip,ankle | r | Stay tall and drive through the whole foot. |  |  | 5
+Tempo Goblet Squat | db,kb | knee,hip,ankle | r | Lower for 3 seconds, pause, stand up. | 6-10 |  | 5
 Heel-Elevated Goblet Squat | db,kb | knee,hip,ankle | r | Heels on a plate or book. Stay tall. | 8-12 |  | 5
 Cable Front Squat | cable | knee,hip,ankle | r | Hold the handle at the chest and squat tall. | 8-12 |  | 5
 Goblet Reverse Lunge | db,kb | knee,hip,ankle | rs | Hold the weight at the chest and step back. | 6-10 |  | 6
@@ -317,32 +318,32 @@ Ankle Rocking | bw | ankle,knee | m | Heel stays planted. |  |  | 1
 Deep Squat Hold | bw | knee,hip,ankle | s | Sink to a comfortable depth, chest tall, breathe. | 20-45 |  | 2
 World’s Greatest Stretch | bw | knee,hip,wrist | m | Own each position and never force range. |  |  | 2
 
-# core | core | Core | list
+# core | core | Core | ladder
 Dead Bug | bw |  | r | Low back gently connected to the floor. |  |  | 2
 Bird Dog | bw | wrist,knee,shoulder | r | Reach long without rotating. |  |  | 2
 Forearm Plank | bw | shoulder | s | Elbows under the shoulders, body in one line, squeeze the glutes. | 20-45 |  | 3
-Forearm Side Plank | bw | shoulder | ss | Stack the hips in one long line. |  |  | 4
-Bear Hold | bw | wrist,knee,shoulder | s | Knees hover an inch off the floor, back flat. | 15-30 |  | 4
 Superman Hold | bw | back | s | Lift the arms and legs a little, neck long. | 15-30 |  | 3
 Heel-Tap Dead Bug | bw |  | rs | Low back on the floor, tap one heel at a time. | 8-12 |  | 3
-Plank Shoulder Taps | bw | wrist,shoulder | rs | Wide feet, tap the shoulder, hips stay level. | 6-10 |  | 5
-Hollow Hold | bw |  | s | Low back pressed down, arms and legs long and low. | 15-30 |  | 5
-Side Plank Hip Dip | bw | shoulder | rs | In a side plank, lower the hip a little and lift. | 6-10 |  | 5
 Pallof Press | band | shoulder | rs | Resist rotation as the hands press out. |  |  | 3
 Pallof Hold | band | shoulder | ss | Press out and hold, resist the pull. | 15-30 |  | 3
 Cable Pallof Press | cable | shoulder | rs | Press out and resist the pull. | 8-12 |  | 3
+Standing Cable Rotation | cable | back | rs | Arms straight, rotate from the ribs, hips steady. | 8-12 |  | 3
+Forearm Side Plank | bw | shoulder | ss | Stack the hips in one long line. |  |  | 4
+Bear Hold | bw | wrist,knee,shoulder | s | Knees hover an inch off the floor, back flat. | 15-30 |  | 4
 Half-Kneeling Cable Pallof Press | cable | shoulder | rs | Tall half-kneel, press and resist twisting. | 8-12 |  | 4
 Cable Wood Chop | cable | back,shoulder | rs | Chop high to low across the body, pivot the feet. | 8-12 |  | 4
 Cable Lift | cable | back,shoulder | rs | Low to high across the body, brace and rotate. | 8-12 |  | 4
-Standing Cable Rotation | cable | back | rs | Arms straight, rotate from the ribs, hips steady. | 8-12 |  | 3
 Kneeling Cable Crunch | cable | back | r | Curl the ribs toward the hips, hips stay still. | 10-15 |  | 4
 Suitcase Hold | db,kb | back,wrist | ss | Stay tall and do not lean. |  |  | 4
+Plank Shoulder Taps | bw | wrist,shoulder | rs | Wide feet, tap the shoulder, hips stay level. | 6-10 |  | 5
+Hollow Hold | bw |  | s | Low back pressed down, arms and legs long and low. | 15-30 |  | 5
+Side Plank Hip Dip | bw | shoulder | rs | In a side plank, lower the hip a little and lift. | 6-10 |  | 5
 Suitcase Carry | db,kb | back,wrist | ss | Walk tall holding one weight at your side. | 20-40 |  | 5
+Hanging Knee Raise | bar | shoulder,wrist | r | Hang tall, lift the knees without swinging. | 6-12 |  | 5
+Goblet Carry | db,kb | back,wrist | s | Hold one weight at your chest and walk tall. | 20-40 |  | 5
 Farmer Carry | db,kb | back,wrist | s | Walk tall with a weight in each hand. | 20-40 |  | 6
 Copenhagen Plank (Bent Knee) | bench | shoulder,hip | ss | Top knee on a bench, lift the hips. | 10-25 |  | 6
-Hanging Knee Raise | bar | shoulder,wrist | r | Hang tall, lift the knees without swinging. | 6-12 |  | 5
 Hanging Leg Raise | bar | shoulder,wrist | r | Hang tall, lift straight legs slowly. | 4-10 |  | 7
-Goblet Carry | db,kb | back,wrist | s | Hold one weight at your chest and walk tall. | 20-40 |  | 5
 `;
 const LADS=[],EX=[];
 LIB.split("\n").forEach(raw=>{const line=raw.trim();if(!line||line.startsWith("//"))return;
@@ -352,6 +353,7 @@ LIB.split("\n").forEach(raw=>{const line=raw.trim();if(!line||line.startsWith("/
  const e={name,pat:g.pat,lad:g.ladder?g.id:null,eq:(eq||"bw").split(",").map(x=>x.split("+").map(y=>y.trim())),jt:jt?jt.split(",").map(x=>x.trim()):[],unit:unit||"r",cue:cue||""};e.load=fl==="noload"?false:fl==="load"?true:e.eq.some(g=>g.some(x=>["db","kb","bb","hex","cable"].includes(x)));e.sc=parseInt(sc)||5;e.imp=/i/i.test(sc||"");
  const R=rg?rg.split("-").map(Number):null,df={r:[8,12],rs:[6,10],s:[20,45],ss:[15,30],m:[8,8]}[e.unit]||[8,12];
  e.lo=R?R[0]:df[0];e.hi=R?R[1]:df[1];EX.push(e);g.steps.push(e)});
+const REG={push:"Try a steeper wall angle, pause 3 seconds at the top, and stop 2 reps short.",pull:"Use lighter band tension or no weight, and pause 2 seconds at the squeeze.",vpull:"Lower slowly from a chair-assisted start, or hang with your feet supported.",hip:"Keep both feet down, shorten the range, and hold the top for 2 seconds.",squat:"Sit to a higher box, hold a counter for balance, and use half the range.",core:"Use shorter holds with more rest, or switch to Dead Bug."};
 const ex=n=>EX.find(e=>e.name===n),UL={r:"reps",rs:"reps each side",s:"sec",ss:"sec each side",m:"slow reps"};
 const VIDEOS=`
 // ======================  EXERCISE VIDEOS  ======================
@@ -427,13 +429,13 @@ function scrub(v,d){if(d>9)return null;if(typeof v==="string")return v.slice(0,4
 function clean(x){try{if(!x||typeof x!=="object"||Array.isArray(x)||!x.days||typeof x.days!=="object"||Array.isArray(x.days))return null;if(JSON.stringify(x).length>1500000)return null;const o=scrub(x,0),f=fresh();for(const k of Object.keys(o.days))if(!DKEY.test(k)||!o.days[k]||typeof o.days[k]!=="object")delete o.days[k];
  for(const k of["prog","lad","wt"])if(!o[k]||typeof o[k]!=="object"||Array.isArray(o[k]))o[k]={};
  const t=o.set&&typeof o.set==="object"&&!Array.isArray(o.set)?o.set:{},ids=EQ.map(e=>e[0]);o.set={...f.set,...t};o.set.units=o.set.units==="kg"?"kg":"lb";o.set.time=TIMES.includes(+o.set.time)?+o.set.time:30;o.set.equip=Array.isArray(o.set.equip)?o.set.equip.filter(q=>ids.includes(q)):[];if(!(o.bw>=20&&o.bw<=400))delete o.bw;
- if(o.owner!=null&&typeof o.owner!=="string")o.owner=null;return o}catch(e){return null}}
+ if(o.owner!=null&&typeof o.owner!=="string")o.owner=null;{const c=o.consent;if(c&&typeof c==="object"&&!Array.isArray(c)&&typeof c.terms==="string")o.consent={terms:c.terms.slice(0,40),ver:String(c.ver||"").slice(0,20),updates:c.updates===true};else delete o.consent}return o}catch(e){return null}}
 function trimS(){let js=JSON.stringify(S);if(js.length<=900000)return;const ks=Object.keys(S.days).sort();while(ks.length>30&&js.length>900000){delete S.days[ks.shift()];js=JSON.stringify(S)}}
 function load(){try{const s=clean(JSON.parse(localStorage.getItem(KEY)));return s?{...fresh(),...s}:fresh()}catch(e){return fresh()}}
 /* ---- Supabase settings: paste yours here (see SETUP steps). The anon key is safe to be public. ---- */
 const SB_URL="https://ynmtqanqdgpogkxvbrel.supabase.co",SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlubXRxYW5xZGdwb2dreHZicmVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMxOTk1NzIsImV4cCI6MjEwODc3NTU3Mn0.msfx5ZQOlDmhy7Ir7WBdcQXnGw4igLjA5pDcV4ktp7A";
 let sb=null;
-let delAsk=false,delDone=false;let S=load(),view="today",F=null,user=null,pt,synced=false,authReady=false,otpEmail=null;
+let cT=false,cU=false,delAsk=false,delDone=false;let S=load(),view="today",F=null,user=null,pt,synced=false,authReady=false,otpEmail=null;
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(user){clearTimeout(pt);pt=setTimeout(push,1500)}}
 const key=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 const today=()=>key(new Date());
@@ -496,7 +498,7 @@ function build(k,c,salt,o){o=o||{};
  /* tune: trim the hardest ladder moves until the session fits the average and the 8+ limit */
  for(let g=0;g<12;g++){const sc=plan.map(p=>sOf(p.n)),avg=sc.reduce((a,b)=>a+b,0)/Math.max(1,sc.length),n8=sc.filter(x=>x>=8).length;if(avg<=R.avg&&n8<=R.allow8)break;
   let best=-1,bs=-1,nx=null;plan.forEach((p,i)=>{if(!p.l||p.fin)return;const L=LADS.find(x=>x.id===p.l),e=ex(p.n),av=L?availOf(L,c):[];let st=null;for(let j=av.indexOf(e)-1;j>=0;j--){if(av[j].sc<e.sc&&!plan.some(q=>q.n===av[j].name)){st=av[j];break}}if(st&&e.sc>bs){bs=e.sc;best=i;nx=st}});
-  if(best<0){plan.forEach((p,i)=>{const e=ex(p.n);if(p.l||p.fin||!e||e.pat==="mob"||e.sc<=2)return;if(e.sc>bs){const nm=new Set(plan.map(q=>q.n)),alt=pool(e.pat,c,nm,{cap:e.sc-1,noImp:R.noImp,prevImp:false});if(alt.length){bs=e.sc;best=i;nx=alt[0]}}});if(best<0)break}
+  if(best<0){plan.forEach((p,i)=>{const e=ex(p.n);if(p.l||p.fin||!e||e.pat==="mob"||e.sc<=2)return;if(e.sc>bs){const nm=new Set(plan.map(q=>q.n)),pe=i>0&&ex(plan[i-1].n),ne=plan[i+1]&&ex(plan[i+1].n),alt=pool(e.pat,c,nm,{cap:e.sc-1,noImp:R.noImp,prevImp:false}).filter(x=>!(x.imp&&((pe&&pe.imp)||(ne&&ne.imp))));if(alt.length){bs=e.sc;best=i;nx=alt[0]}}});if(best<0)break}
   plan[best].n=nx.name;plan[best].m=false}
  if(!plan.length)plan.push({n:"90/90 Breathing",sets:1,l:null,m:false});
  if(o.bonus)plan.forEach(p=>{p.m=false});
@@ -507,11 +509,13 @@ const chip=(g,v,l,on)=>`<button class="chip" data-a="chip" data-g="${g}" data-v=
 function formV(){if(!F)initF();
  const st=F.step,hd=(t,c)=>`<div class="stepbar"><i style="width:${st*20}%"></i></div><p class="muted">Step ${st} of 5 · Daily check-in</p><h2>${t}</h2><p class="muted">${c}</p>`;
  const scale=(k,lb)=>`<div class="sc" role="group">${[2,4,6,8,10].map((v,i)=>`<button data-a="pick" data-k="${k}" data-v="${v}" aria-pressed="${F[k]!=null&&Math.round(F[k]/2)*2===v}"><span>${v}</span><small>${lb[i]}</small></button>`).join("")}</div>`;
+ const ANCH={sleep:["1–2 Barely slept, feel awful","3–4 Short or broken sleep","5–6 Okay, a normal night","7–8 Good, woke up rested","9–10 Deep sleep, fully recharged"],energy:["1–2 Wiped out, running on empty","3–4 Low, dragging","5–6 Steady, an average day","7–8 Good, ready to work","9–10 Peak, sharp and strong"],stress:["1–2 Calm, relaxed","3–4 Light stress","5–6 Moderate, manageable","7–8 High, on edge","9–10 Maxed out, overwhelmed"]},WN={sleep:["Sleep Score","Garmin or Apple Sleep Score"],energy:["Body Battery","Garmin Body Battery"],stress:["Stress score","Garmin Stress score (higher means more stress)"]};
+ const anch=k=>`<ul class="anch">${ANCH[k].map(t=>`<li>${t}</li>`).join("")}</ul><details class="wch"${F[k+"W"]!=null?" open":""}><summary>I use a watch</summary><label class="muted" for="w-${k}">${WN[k][1]} (0–100). We convert it to this 1–10 scale.</label><input id="w-${k}" type="number" inputmode="numeric" min="0" max="100" step="1" data-a="watch" data-k="${k}" placeholder="0–100" value="${F[k+"W"]!=null?F[k+"W"]:""}"></details>`;
  const nav=(ok,last)=>`<div class="acts">${st>1?`<button class="btn ghost" data-a="back">Back</button>`:"<span></span>"}${last?`<button class="btn ${ok?"":"off"}" data-a="go">Build today’s mission</button>`:`<button class="btn ${ok?"":"off"}" data-a="next">Next</button>`}</div>`;
  let b="";
- if(st===1)b=hd("How did you sleep?","Choose the number that best fits last night’s sleep.")+scale("sleep",["Rough","Poor","Okay","Good","Elite"])+nav(F.sleep!=null);
- else if(st===2)b=hd("How is your energy?","Be honest. M☺︎BENTUM works better when the input is real.")+scale("energy",["Empty","Low","Steady","High","Locked in"])+nav(F.energy!=null);
- else if(st===3)b=hd("How stressed are you?","Higher stress lowers today’s recommended intensity.")+scale("stress",["Calm","Light","Moderate","High","Maxed"])+nav(F.stress!=null);
+ if(st===1)b=hd("How did you sleep?","Choose the number that best fits last night’s sleep.")+scale("sleep",["Rough","Poor","Okay","Good","Elite"])+anch("sleep")+nav(F.sleep!=null);
+ else if(st===2)b=hd("How is your energy?","Be honest. M☺︎BENTUM works better when the input is real.")+scale("energy",["Empty","Low","Steady","High","Locked in"])+anch("energy")+nav(F.energy!=null);
+ else if(st===3)b=hd("How stressed are you?","Higher stress lowers today’s recommended intensity.")+scale("stress",["Calm","Light","Moderate","High","Maxed"])+anch("stress")+nav(F.stress!=null);
  else if(st===4)b=hd("Any pain or restriction?","Pick every area that hurts or feels restricted. Moves that load those areas are left out.")+`<div class="chips">${PAIN.map(([v,l])=>chip("pain",v,l,F.pain.includes(v))).join("")}${chip("pain","none","No pain today",F.pain.length===0)}</div>`+nav(true);
  else b=hd("Time and equipment","Pick what you have. Bodyweight moves are always included.")+`<h3>Time</h3><div class="chips">${TIMES.map(t=>chip("time",t,t+" min",F.time===t)).join("")}</div>
  <h3>Equipment</h3><div class="chips">${chip("equip","none","Bodyweight only (at home)",F.equip.length===0)}${EQ.map(([v,l])=>chip("equip",v,l,F.equip.includes(v))).join("")}</div>${F.equip.length===0?`<p class="muted">Only moves that need no equipment, all doable at home.</p>`:""}
@@ -617,7 +621,7 @@ function tmTick(){const T=TM;if(!T||!T.run)return;T.left=T.end-Date.now();const 
   T.left=T.phases[T.pi].s*1000;T.end=Date.now()+T.left;T.lastSec=null;tmEnter()}
  tmDraw()}
 function closeTimer(){tmStop();if(TM){TM.run=false}TM=null;$("#tm").hidden=true;document.body.style.overflow="";if(tmOpener&&tmOpener.focus)try{tmOpener.focus()}catch(e){}}
-addEventListener("change",e=>{const t=e.target;if(t.classList&&t.classList.contains("rm")){setRM(t.dataset.n,parseFloat(t.value));render();return}if(t.id==="bwi"){setBW(parseFloat(t.value));render();return}if(!TM)return;if(t.id==="tmreps"){TM.reps=Math.min(60,Math.max(1,+t.value||8));tmReset()}else if(t.id==="tmsecs"){TM.secs=Math.min(1800,Math.max(5,+t.value||30));tmReset()}});
+addEventListener("change",e=>{const t=e.target;if(t.dataset&&t.dataset.a==="watch"&&F){const k=t.dataset.k,v=parseFloat(t.value);if(["sleep","energy","stress"].includes(k)){if(v>=0&&v<=100){F[k]=Math.min(10,Math.max(1,Math.round(v/10)));F[k+"W"]=Math.round(v)}else{delete F[k+"W"]}render()}return}if(t.classList&&t.classList.contains("rm")){setRM(t.dataset.n,parseFloat(t.value));render();return}if(t.id==="bwi"){setBW(parseFloat(t.value));render();return}if(!TM)return;if(t.id==="tmreps"){TM.reps=Math.min(60,Math.max(1,+t.value||8));tmReset()}else if(t.id==="tmsecs"){TM.secs=Math.min(1800,Math.max(5,+t.value||30));tmReset()}});
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&TM&&TM.run){wake()}});
 /* ===== Day detail ===== */
 function dayHTML(k){const d=S.days[k];if(!d)return"<p class=\"muted\">No data for that day.</p>";const u=isKg()?"kg":"lb";
@@ -673,12 +677,12 @@ function finish(wi){const k=today(),d=S.days[k],bn=wi!==undefined&&wi!=="",wk=bn
   if(L&&p.m&&!S.lad[L.id])S.lad[L.id]=e.name;
   if(hit&&rpe<=8){
    if(t<e.hi){const nt=Math.min(e.hi,t+st);S.prog[p.n]={t:nt};up.push(`${p.n}: next target ${nt} ${UL[e.unit]}`)}
-   else if(!entered){up.push(`${p.n}: top of the range. Log your reps next time to unlock the next level.`)}
+   else if(!entered&&rpe>5){up.push(`${p.n}: top of the range. Log your reps, or rate the workout easier, to unlock the next level.`)}
    else if(L&&p.m){const nx=stepNear(L,e,d.ck,1);if(nx){S.lad[L.id]=nx.name;if(!S.prog[nx.name])S.prog[nx.name]={t:nx.lo};up.push(`LEVEL UP: ${e.name} → ${nx.name}`)}else{up.push(`${e.name}: top of this ladder. Add load or slow the tempo.`)}}
    else{up.push(`${e.name}: target maxed. Add load or slow the tempo.`)}
   }else if(entered&&a<t&&rpe>=9){
    if(t>e.lo){const nt=Math.max(e.lo,t-st);S.prog[p.n]={t:nt};up.push(`Stepped back: ${p.n} target is now ${nt} ${UL[e.unit]}`)}
-   else if(L&&p.m){const pv=stepNear(L,e,d.ck,-1);if(pv){S.lad[L.id]=pv.name;S.prog[pv.name]=S.prog[pv.name]||{t:Math.max(pv.lo,pv.hi-2*st)};up.push(`Stepped back: ${e.name} → ${pv.name}`)}else{up.push(`${e.name}: still tough at the easiest step. Keep the effort lower and focus on clean form.`)}}
+   else if(L&&p.m){const pv=stepNear(L,e,d.ck,-1);if(pv){S.lad[L.id]=pv.name;S.prog[pv.name]=S.prog[pv.name]||{t:Math.max(pv.lo,pv.hi-2*st)};up.push(`Stepped back: ${e.name} → ${pv.name}`)}else{up.push(`${e.name}: still tough at the easiest step. ${REG[L.id]||"Lower the effort and focus on clean form."}`)}}
    else{up.push(`${e.name}: still tough at the lowest target. Keep the effort lower and focus on clean form.`)}
   }});
  d.fin={rpe,feel,up,at:Date.now()};popQ=pickQuote(k+"m"+Date.now());save();render();showQ(popQ)}
@@ -701,7 +705,7 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b
  else if(a==="qclose"){if(b.tagName==="BUTTON"||e.target===b)closeQ();return}
  else if(a==="instx"){try{localStorage.setItem("momentum.inst","1")}catch(x){}}
  else if(a==="doinst"){if(instEv){instEv.prompt();instEv=null}}
- else if(a==="pick"){F[b.dataset.k]=+b.dataset.v}
+ else if(a==="pick"){F[b.dataset.k]=+b.dataset.v;delete F[b.dataset.k+"W"]}
  else if(a==="next"){F.step=Math.min(5,F.step+1)}
  else if(a==="back"){F.step=Math.max(1,F.step-1)}
  else if(a==="chip"){const g=b.dataset.g,v=b.dataset.v;if(g==="time")F.time=+v;else if(g==="level")F.level=v;else if(g==="units")F.units=v;else if(g==="pain"&&v==="none")F.pain=[];else if(g==="equip"&&v==="none")F.equip=[];else{const arr=F[g],x=arr.indexOf(v);x<0?arr.push(v):arr.splice(x,1)}}
@@ -728,7 +732,7 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b
 document.addEventListener("input",e=>{const t=e.target,a=t.dataset.a;if(!a)return;
  if(a==="rng"){F[t.dataset.k]=+t.value;$("#v-"+t.dataset.k).textContent=t.value}
  else if(a==="rpe"){$("#v-rpe").textContent=t.value}
- else if(a==="red"){F.red=t.checked}
+ else if(a==="red"){F.red=t.checked}else if(a==="cT"){cT=t.checked}else if(a==="cU"){cU=t.checked}
  else if(a==="num"){const d=S.days[today()],wk=t.dataset.w?d.bonus[+t.dataset.w]:d,n=wk.plan[+t.dataset.i].n;wk.log[n]=wk.log[n]||{};wk.log[n].a=+t.value;save()}
  else if(a==="wt"){const d=S.days[today()],wk=t.dataset.w?d.bonus[+t.dataset.w]:d,n=wk.plan[+t.dataset.i].n;wk.log[n]=wk.log[n]||{};const v=parseFloat(t.value);if(v>0)wk.log[n].kg=fromU(Math.min(v,2000));else delete wk.log[n].kg;save()}});
 function signinV(){const hd=`<section class="card"><h2>Sign in</h2><p class="muted">Sign in with your email from any browser or device. Your workouts, levels, weights and points stay with that email.</p></section>`,bk=`<p><button class="btn ghost" data-a="tab" data-v="today">Back</button></p>`;
@@ -741,17 +745,17 @@ function accV(){if(!sb||!authReady)return"";
  if(user)return`<section class="card"><h3>Account</h3><p class="muted">Signed in as ${esc(user.email)}. This device stays signed in until you tap Sign out.</p><button class="btn ghost" data-a="logout">Sign out</button></section>`+(delAsk?`<section class="card"><h3>Delete my account</h3><p class="muted">This permanently deletes your sign-in and all workout data stored in the cloud, and clears this device. It cannot be undone. Type DELETE to confirm.</p><input id="delc" type="text" autocomplete="off" autocapitalize="characters" aria-label="Type DELETE to confirm" style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--ln);background:var(--sf2);color:var(--tx);margin-bottom:10px"><button class="btn" data-a="delgo">Delete everything</button> <button class="btn ghost" data-a="delno">Cancel</button><p id="am" class="muted"></p></section>`:`<section class="card"><p class="muted" style="margin:0 0 8px">Want to leave? You can erase your account and cloud data.</p><button class="btn ghost" data-a="delask">Delete my account</button></section>`);
  const bx='style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--ln);background:var(--sf2);color:var(--tx);margin-bottom:10px"';
  if(otpEmail)return`<section class="card"><h3>Enter your code</h3><p class="muted">We emailed ${esc(otpEmail)}. Type the code from the email here, or tap the link in it.</p><input id="otp" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="Code from the email" aria-label="Code from the email" ${bx}><button class="btn" data-a="verify">Sign in</button> <button class="btn ghost" data-a="otpback">Use a different email</button><p id="am" class="muted"></p></section>`;
- return dd+`<section class="card"><h3>Save your progress</h3><p class="muted">Sign in once with your email and this device remembers you. No password needed.</p><input id="em" type="email" placeholder="you@email.com" autocomplete="email" aria-label="Email" ${bx}><button class="btn" data-a="login">Email me a sign-in code</button><p id="am" class="muted"></p><p class="muted">By signing in you agree to the <a href="terms.html">Terms</a> and <a href="privacy.html">Privacy Policy</a>. You must be 18 or older.</p></section>`}
-async function login(){const em=$("#em").value.trim(),m=$("#am");if(!em){m.textContent="Enter your email first.";return}m.textContent="Sending…";const{error}=await sb.auth.signInWithOtp({email:em,options:{emailRedirectTo:location.origin+location.pathname}});if(error){m.textContent=error.message;return}otpEmail=em;render()}
+ return dd+`<section class="card"><h3>Save your progress</h3><p class="muted">Sign in once with your email and this device remembers you. No password needed.</p><input id="em" type="email" placeholder="you@email.com" autocomplete="email" aria-label="Email" ${bx}><label class="cons"><input type="checkbox" data-a="cT" ${cT?"checked":""}><span>I am 18 or older, and I have read and agree to the <a href="terms.html" target="_blank" rel="noopener">Terms</a> and the <a href="privacy.html" target="_blank" rel="noopener">Privacy Policy</a>. (Required)</span></label><label class="cons"><input type="checkbox" data-a="cU" ${cU?"checked":""}><span>Send me updates and offers from M☺︎BENTUM by email. (Optional. You can unsubscribe anytime.)</span></label><button class="btn" data-a="login">Email me a sign-in code</button><p id="am" class="muted"></p></section>`}
+async function login(){const em=$("#em").value.trim(),m=$("#am");if(!em){m.textContent="Enter your email first.";return}if(!cT){m.textContent="Please check the box to agree to the Terms and Privacy Policy.";return}try{localStorage.setItem("momentum.consent",JSON.stringify({terms:new Date().toISOString(),ver:"2026-11",updates:!!cU}))}catch(e){}m.textContent="Sending…";const{error}=await sb.auth.signInWithOtp({email:em,options:{emailRedirectTo:location.origin+location.pathname}});if(error){m.textContent=error.message;return}otpEmail=em;render()}
 async function verify(){const code=($("#otp").value||"").replace(/\s/g,""),m=$("#am");if(!code){m.textContent="Type the code from the email.";return}m.textContent="Checking…";
  for(const type of["email","magiclink","signup"]){const r=await sb.auth.verifyOtp({email:otpEmail,token:code,type});if(!r.error){otpEmail=null;return}}
  m.textContent="That code didn’t work. Check it and try again, or go back and request a new one."}
-function mergeS(a,b){const m={...fresh(),...a,days:{...b.days,...a.days},prog:{...a.prog},lad:{...(b.lad||{}),...(a.lad||{})},wt:mergeWt(a.wt,b.wt)};for(const k in b.days){const x=a.days[k],y=b.days[k];if(x&&y&&((y.fin&&!x.fin)||bonusDone(y).length>bonusDone(x).length))m.days[k]=y}for(const n in(b.prog||{})){if(!m.prog[n]||b.prog[n].t>m.prog[n].t)m.prog[n]=b.prog[n]}for(const id in(b.lad||{})){const L=LADS.find(x=>x.id===id),ai=L?L.steps.findIndex(e=>e.name===(a.lad||{})[id]):-1,bi=L?L.steps.findIndex(e=>e.name===b.lad[id]):-1;if(bi>ai)m.lad[id]=b.lad[id]}if(!(m.bw>0)&&b.bw>0)m.bw=b.bw;return m}
+function mergeS(a,b){const m={...fresh(),...a,days:{...b.days,...a.days},prog:{...a.prog},lad:{...(b.lad||{}),...(a.lad||{})},wt:mergeWt(a.wt,b.wt)};for(const k in b.days){const x=a.days[k],y=b.days[k];if(x&&y&&((y.fin&&!x.fin)||bonusDone(y).length>bonusDone(x).length))m.days[k]=y}for(const n in(b.prog||{})){if(!m.prog[n]||b.prog[n].t>m.prog[n].t)m.prog[n]=b.prog[n]}for(const id in(b.lad||{})){const L=LADS.find(x=>x.id===id),ai=L?L.steps.findIndex(e=>e.name===(a.lad||{})[id]):-1,bi=L?L.steps.findIndex(e=>e.name===b.lad[id]):-1;if(bi>ai)m.lad[id]=b.lad[id]}if(!(m.bw>0)&&b.bw>0)m.bw=b.bw;if(!m.consent&&b.consent)m.consent=b.consent;return m}
 async function pull(quiet){if(!sb||!user)return;const uid=user.id,before=quiet?JSON.stringify(S):null;let ok=false;try{
  const r=await sb.from("progress").select("data").eq("user_id",uid).maybeSingle();if(r.error)throw r.error;if(!user||user.id!==uid)return;
  const cloud=clean(r.data&&r.data.data);
  if(S.owner&&S.owner!==uid)S=cloud?{...fresh(),...cloud}:fresh();else if(cloud)S=mergeS(S,cloud);
- S.owner=uid;synced=true;ok=true;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}await push()
+ S.owner=uid;try{const pc=JSON.parse(localStorage.getItem("momentum.consent")||"null");if(pc&&pc.terms){S.consent=pc;localStorage.removeItem("momentum.consent")}}catch(e){}synced=true;ok=true;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}await push()
  }catch(e){if(user&&user.id===uid&&S.owner&&S.owner!==uid){S=fresh();try{localStorage.removeItem(KEY)}catch(x){}}}
  if(!quiet||JSON.stringify(S)!==before)render()}
 async function push(){if(!sb||!user)return false;if(!synced){await pull();return synced}try{trimS();const r=await sb.from("progress").upsert({user_id:user.id,data:S,updated_at:new Date().toISOString()});return!(r&&r.error)}catch(e){return false}}
