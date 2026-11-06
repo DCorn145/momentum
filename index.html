@@ -91,6 +91,8 @@ nav button.on,.chip[aria-pressed=true],.sc button[aria-pressed=true],.btn{backgr
 .tick,.exr button,.vx{width:44px;height:44px}
 .chip,nav button,.hb,.btn,.inst .x{min-height:44px}.inst .x{min-width:44px}
 .exr input{min-height:44px}.nm{padding:8px 0}
+.slw{margin:6px 0 4px}.slv{text-align:center;margin-bottom:6px}.slv span{display:block;font:56px/1 'Russo One',Impact,sans-serif;color:var(--red)}.slv span.idle{color:var(--mu)}.slv small{display:block;color:var(--mu);font-size:14px;margin-top:6px;min-height:20px}
+input.sl{width:100%;height:48px;margin:6px 0 0;accent-color:var(--red);touch-action:pan-y;cursor:pointer;background:transparent}.ticks{display:flex;justify-content:space-between;padding:0 8px;color:var(--mu);font-size:12px}.anch li.on{color:var(--tx);font-weight:700}
 .anch{list-style:none;margin:14px 0 0;padding:0;font-size:14px;color:var(--mu)}.anch li{padding:3px 0}.wch{margin-top:14px;border:1px solid var(--ln);border-radius:12px;padding:10px 12px}.wch summary{cursor:pointer;font-weight:700;min-height:28px}.wch input{width:100%;padding:12px;border-radius:10px;border:1px solid var(--ln);background:var(--sf2);color:var(--tx);margin-top:8px}.cons{font-size:14px;color:var(--mu)}.cons a{color:var(--red);font-weight:700}.cons{display:flex;gap:10px;align-items:flex-start;margin:10px 0;line-height:1.35}.cons input{width:22px;height:22px;flex:none;margin-top:2px}
 .lnk{background:none;border:0;padding:6px 0;color:var(--red);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer;min-height:44px}.rm,#bwi{width:90px}
 .fine a{color:inherit;display:inline-block;padding:12px 8px;font-weight:600}
@@ -476,7 +478,7 @@ function build(k,c,salt,o){o=o||{};
  const r=rng(k+"|"+salt),{tier}=meta(c),f=o.focus||focusFor(k,c),low=tier==="low",TM=o.time||c.time,R=rulesCtx(k,c);
  const seqs={lower:["mob","squat","hinge","core","squat","hinge","mob"],upper:["mob","push","pull","vpull","core","push","pull","mob"],full:["mob","squat","push","hinge","pull","vpull","core","mob"],mob:["mob","core","mob","core","mob","core","mob","mob"],cond:["mob","cond","cond","cond","cond","core","cond","cond"]};
  const seq=low&&f!=="mob"?["mob","core","mob","hinge","mob","pull","core"]:seqs[f];
- const sets=low?2:TM>=45?4:3,used=new Set(),uses={},plan=[],finish=!o.bonus&&!low&&TM>=30&&c.sleep>=9&&c.energy>=9&&c.stress<=2&&["lower","upper","full"].includes(f),budget=finish?TM-4:TM;let mins=0;
+ const sets=low?2:TM>=45?4:3,used=new Set(),uses={},plan=[],finish=!o.bonus&&!low&&TM>=30&&c.sleep>=9&&c.energy>=9&&c.stress<=1&&["lower","upper","full"].includes(f),budget=finish?TM-4:TM;let mins=0;
  const prev=()=>plan.length?ex(plan[plan.length-1].n):null,lim=(x)=>{const q=prev();return{cap:q&&q.sc>=8?Math.min(R.cap,7):R.cap,noImp:R.noImp,prevImp:!!(q&&q.imp),...x}};
  for(let i=0;i<20&&plan.length<10;i++){
   const p=seq[i%seq.length],est=p==="mob"?2:sets*1.7;
@@ -508,12 +510,13 @@ function initF(){const p=(S.days[today()]||{}).ck;F={sleep:null,energy:null,stre
 const chip=(g,v,l,on)=>`<button class="chip" data-a="chip" data-g="${g}" data-v="${v}" aria-pressed="${on}">${l}</button>`;
 function formV(){if(!F)initF();
  const st=F.step,hd=(t,c)=>`<div class="stepbar"><i style="width:${st*20}%"></i></div><p class="muted">Step ${st} of 5 · Daily check-in</p><h2>${t}</h2><p class="muted">${c}</p>`;
- const scale=(k,lb)=>`<div class="sc" role="group">${[2,4,6,8,10].map((v,i)=>`<button data-a="pick" data-k="${k}" data-v="${v}" aria-pressed="${F[k]!=null&&Math.round(F[k]/2)*2===v}"><span>${v}</span><small>${lb[i]}</small></button>`).join("")}</div>`;
+ const scale=(k,lb)=>{const v=F[k],has=v!=null,sh=has?v:5,tx=has?ANCH[k][Math.ceil(v/2)-1].replace(/^\d+–\d+\s/,""):"Drag the slider";return`<div class="slw"><div class="slv"><span id="sv-${k}" class="${has?"":"idle"}">${has?v:"–"}</span><small id="st-${k}">${tx}</small></div><input class="sl" id="sl-${k}" type="range" min="1" max="10" step="1" value="${sh}" data-a="sl" data-k="${k}" aria-label="${k} from 1 to 10"><div class="ticks">${[1,2,3,4,5,6,7,8,9,10].map(n=>`<span>${n}</span>`).join("")}</div></div>`};
  const ANCH={sleep:["1–2 Barely slept, feel awful","3–4 Short or broken sleep","5–6 Okay, a normal night","7–8 Good, woke up rested","9–10 Deep sleep, fully recharged"],energy:["1–2 Wiped out, running on empty","3–4 Low, dragging","5–6 Steady, an average day","7–8 Good, ready to work","9–10 Peak, sharp and strong"],stress:["1–2 Calm, relaxed","3–4 Light stress","5–6 Moderate, manageable","7–8 High, on edge","9–10 Maxed out, overwhelmed"]},WN={sleep:["Sleep Score","Garmin or Apple Sleep Score"],energy:["Body Battery","Garmin Body Battery"],stress:["Stress score","Garmin Stress score (higher means more stress)"]};
- const anch=k=>`<ul class="anch">${ANCH[k].map(t=>`<li>${t}</li>`).join("")}</ul><details class="wch"${F[k+"W"]!=null?" open":""}><summary>I use a watch</summary><label class="muted" for="w-${k}">${WN[k][1]} (0–100). We convert it to this 1–10 scale.</label><input id="w-${k}" type="number" inputmode="numeric" min="0" max="100" step="1" data-a="watch" data-k="${k}" placeholder="0–100" value="${F[k+"W"]!=null?F[k+"W"]:""}"></details>`;
+ window.ANCH_T=(k,v)=>ANCH[k][Math.ceil(v/2)-1].replace(/^\d+–\d+\s/,"");
+ const anch=k=>`<ul class="anch">${ANCH[k].map((t,n)=>`<li${F[k]!=null&&Math.ceil(F[k]/2)-1===n?' class="on"':""}>${t}</li>`).join("")}</ul><details class="wch"${F[k+"W"]!=null?" open":""}><summary>I use a watch</summary><label class="muted" for="w-${k}">${WN[k][1]} (0–100). We convert it to this 1–10 scale.</label><input id="w-${k}" type="number" inputmode="numeric" min="0" max="100" step="1" data-a="watch" data-k="${k}" placeholder="0–100" value="${F[k+"W"]!=null?F[k+"W"]:""}"></details>`;
  const nav=(ok,last)=>`<div class="acts">${st>1?`<button class="btn ghost" data-a="back">Back</button>`:"<span></span>"}${last?`<button class="btn ${ok?"":"off"}" data-a="go">Build today’s mission</button>`:`<button class="btn ${ok?"":"off"}" data-a="next">Next</button>`}</div>`;
  let b="";
- if(st===1)b=hd("How did you sleep?","Choose the number that best fits last night’s sleep.")+scale("sleep",["Rough","Poor","Okay","Good","Elite"])+anch("sleep")+nav(F.sleep!=null);
+ if(st===1)b=hd("How did you sleep?","Slide to the number that best fits last night’s sleep, from 1 to 10.")+scale("sleep",["Rough","Poor","Okay","Good","Elite"])+anch("sleep")+nav(F.sleep!=null);
  else if(st===2)b=hd("How is your energy?","Be honest. M☺︎BENTUM works better when the input is real.")+scale("energy",["Empty","Low","Steady","High","Locked in"])+anch("energy")+nav(F.energy!=null);
  else if(st===3)b=hd("How stressed are you?","Higher stress lowers today’s recommended intensity.")+scale("stress",["Calm","Light","Moderate","High","Maxed"])+anch("stress")+nav(F.stress!=null);
  else if(st===4)b=hd("Any pain or restriction?","Pick every area that hurts or feels restricted. Moves that load those areas are left out.")+`<div class="chips">${PAIN.map(([v,l])=>chip("pain",v,l,F.pain.includes(v))).join("")}${chip("pain","none","No pain today",F.pain.length===0)}</div>`+nav(true);
@@ -729,7 +732,10 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b
  else if(a==="gosign"){view="signin";try{scrollTo(0,0)}catch(e){}}
  else if(a==="delask"){delAsk=true;delDone=false;render();return}else if(a==="delno"){delAsk=false;render();return}else if(a==="delgo"){delAcct(b);return}else if(a==="logout"){logout(b);return}
  render()});
-document.addEventListener("input",e=>{const t=e.target,a=t.dataset.a;if(!a)return;
+function slUI(k,v){const n=document.getElementById("sv-"+k),t=document.getElementById("st-"+k);if(n){n.textContent=v;n.classList.remove("idle")}if(t)t.textContent=ANCH_T(k,v);document.querySelectorAll(".anch li").forEach((li,i)=>li.classList.toggle("on",i===Math.ceil(v/2)-1));document.querySelectorAll('[data-a="next"],[data-a="go"]').forEach(b=>b.classList.remove("off"))}
+document.addEventListener("pointerup",e=>{const t=e.target;if(t.dataset&&t.dataset.a==="sl"&&F&&F[t.dataset.k]==null){F[t.dataset.k]=+t.value;slUI(t.dataset.k,+t.value)}});
+document.addEventListener("keydown",e=>{const t=e.target;if(t.dataset&&t.dataset.a==="sl"&&F&&F[t.dataset.k]==null&&/Arrow|Home|End|Page/.test(e.key)){setTimeout(()=>{F[t.dataset.k]=+t.value;slUI(t.dataset.k,+t.value)},0)}});
+document.addEventListener("input",e=>{const t=e.target,a=t.dataset.a;if(!a)return;if(a==="sl"){if(F){const k=t.dataset.k,v=+t.value;F[k]=v;delete F[k+"W"];slUI(k,v)}return}
  if(a==="rng"){F[t.dataset.k]=+t.value;$("#v-"+t.dataset.k).textContent=t.value}
  else if(a==="rpe"){$("#v-rpe").textContent=t.value}
  else if(a==="red"){F.red=t.checked}else if(a==="cT"){cT=t.checked}else if(a==="cU"){cU=t.checked}
