@@ -94,7 +94,7 @@ nav button.on,.chip[aria-pressed=true],.sc button[aria-pressed=true],.btn{backgr
 .slw{margin:6px 0 4px}.slv{text-align:center;margin-bottom:6px}.slv span{display:block;font:56px/1 'Russo One',Impact,sans-serif;color:var(--red)}.slv span.idle{color:var(--mu)}.slv small{display:block;color:var(--mu);font-size:15px;margin-top:6px;min-height:22px}
 input.sl{width:100%;height:48px;margin:6px 0 0;accent-color:var(--red);touch-action:pan-y;cursor:pointer;background:transparent}.ticks{display:flex;justify-content:space-between;padding:0 8px;color:var(--mu);font-size:12px}.anch li.on{color:var(--tx);font-weight:700}
 .bdgs{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.bdg{border:1px solid var(--ln);border-radius:14px;padding:10px 12px;opacity:.55}.bdg.on{opacity:1;border-color:var(--red)}.bdg b{color:var(--red);font-size:18px;display:block}.bdg span{font-weight:700;display:block}.bdg small{color:var(--mu);font-size:12px;display:block;margin-top:2px}
-.rep{--tx:#111;--mu:#555;--sf:#f5f5f5;--sf2:#eee;--ln:#ddd;position:fixed;inset:0;z-index:60;background:#fff;color:#111;overflow:auto}.repc{max-width:720px;margin:0 auto;padding:16px 16px 40px}.repc .muted{color:#555}.repbar{display:flex;gap:10px;margin-bottom:12px}.rept{width:100%;border-collapse:collapse;margin:6px 0 14px}.rept th,.rept td{text-align:left;border-bottom:1px solid #ddd;padding:6px 8px;font-size:14px}.repc h1{font-size:24px;margin:8px 0}.repc h2{font-size:16px;margin:18px 0 6px}
+.ftov{position:fixed;inset:0;z-index:61;background:var(--bg);color:var(--tx);overflow:auto}.ftc{max-width:560px;margin:0 auto;padding:16px 16px 40px}.ftc .btn.off{opacity:.45}.rep{--tx:#111;--mu:#555;--sf:#f5f5f5;--sf2:#eee;--ln:#ddd;position:fixed;inset:0;z-index:60;background:#fff;color:#111;overflow:auto}.repc{max-width:720px;margin:0 auto;padding:16px 16px 40px}.repc .muted{color:#555}.repbar{display:flex;gap:10px;margin-bottom:12px}.rept{width:100%;border-collapse:collapse;margin:6px 0 14px}.rept th,.rept td{text-align:left;border-bottom:1px solid #ddd;padding:6px 8px;font-size:14px}.repc h1{font-size:24px;margin:8px 0}.repc h2{font-size:16px;margin:18px 0 6px}
 @media print{body>*:not(#rep){display:none!important}.rep{position:static!important;overflow:visible!important}.noprint{display:none!important}}
 .sec{font:12px/1 'Russo One',Impact,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--mu);margin:16px 2px 4px}.anch{list-style:none;margin:14px 0 0;padding:0;font-size:14px;color:var(--mu)}.anch li{padding:3px 0}.wch{margin-top:14px;border:1px solid var(--ln);border-radius:12px;padding:10px 12px}.wch summary{cursor:pointer;font-weight:700;min-height:28px}.wch input{width:100%;padding:12px;border-radius:10px;border:1px solid var(--ln);background:var(--sf2);color:var(--tx);margin-top:8px}.cons{font-size:14px;color:var(--mu)}.cons a{color:var(--red);font-weight:700}.cons{display:flex;gap:10px;align-items:flex-start;margin:10px 0;line-height:1.35}.cons input{width:22px;height:22px;flex:none;margin-top:2px}
 .lnk{background:none;border:0;padding:6px 0;color:var(--red);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer;min-height:44px}.rm,#bwi{width:90px}
@@ -367,6 +367,14 @@ LIB.split("\n").forEach(raw=>{const line=raw.trim();if(!line||line.startsWith("/
  e.lo=R?R[0]:df[0];e.hi=R?R[1]:df[1];EX.push(e);g.steps.push(e)});
 LADS.forEach(l=>{if(l.ladder)l.steps.sort((a,b)=>a.sc-b.sc)});
 const SCH={A:[[1,20],[2,10],[2,12],[3,10],[3,15]],B:[[2,8],[3,6],[3,8],[4,5],[4,6]],C:[[2,3],[3,3],[5,4],[5,5]]},schTxt=(L,i)=>{const q=SCH[L][Math.min(i,SCH[L].length-1)];return q[0]+" × "+q[1]},isSch=e=>!!e&&!!e.l&&(e.unit==="r"||e.unit==="rs");
+const FTQ=[
+ {k:"push",t:"Push-ups",q:"How many strict push-ups can you do in a row? Chest to the floor, body in one line.",o:["None yet","1 to 5","6 to 15","16 to 30","31 or more"],ids:["push"]},
+ {k:"pu",t:"Pull-ups",q:"How many strict pull-ups or chin-ups can you do? Skip this if you have no bar.",o:["None yet","1 to 2","3 to 7","8 to 12","13 or more"],ids:["vpull","pull"]},
+ {k:"sq",t:"Squats",q:"How many bodyweight squats can you do in a row with good form?",o:["Fewer than 10","10 to 19","20 to 34","35 to 50","More than 50"],ids:["squat"]},
+ {k:"hip",t:"Glute bridge",q:"How many single-leg glute bridges can you do on each side?",o:["None, I cannot hold the position","1 to 5","6 to 12","13 to 20","More than 20"],ids:["hip"]},
+ {k:"core",t:"Plank",q:"How long can you hold a forearm plank with good form?",o:["Under 15 seconds","15 to 30 seconds","30 to 60 seconds","1 to 2 minutes","More than 2 minutes"],ids:["core"]}],
+ FTF=[0,.12,.3,.5,.72],LIDS=["push","pull","vpull","hip","squat","core"],
+ dbt=(a,b)=>Math.round((Date.parse(b+"T00:00:00Z")-Date.parse(a+"T00:00:00Z"))/864e5);
 const siOf=n=>{const q=S.prog&&S.prog[n];return q&&q.si>0?q.si|0:0};
 const HINT={sleep:["Barely slept","Short or broken","Okay","Rested","Fully recharged"],energy:["Wiped out","Low","Steady","Ready to work","Peak"],stress:["Calm","Light","Moderate","High","Overwhelmed"]};const HINT_T=(k,v)=>HINT[k][Math.ceil(v/2)-1];
 const REG={push:"Try a steeper wall angle, pause 3 seconds at the top, and stop 2 reps short.",pull:"Use lighter band tension or no weight, and pause 2 seconds at the squeeze.",vpull:"Lower slowly from a chair-assisted start, or hang with your feet supported.",hip:"Keep both feet down, shorten the range, and hold the top for 2 seconds.",squat:"Sit to a higher box, hold a counter for balance, and use half the range.",core:"Use shorter holds with more rest, or switch to Dead Bug."};
@@ -467,7 +475,9 @@ function scrub(v,d){if(d>9)return null;if(typeof v==="string")return v.slice(0,4
 function clean(x){try{if(!x||typeof x!=="object"||Array.isArray(x)||!x.days||typeof x.days!=="object"||Array.isArray(x.days))return null;if(JSON.stringify(x).length>1500000)return null;const o=scrub(x,0),f=fresh();for(const k of Object.keys(o.days))if(!DKEY.test(k)||!o.days[k]||typeof o.days[k]!=="object")delete o.days[k];
  for(const k of["prog","lad","wt"])if(!o[k]||typeof o[k]!=="object"||Array.isArray(o[k]))o[k]={};
  const t=o.set&&typeof o.set==="object"&&!Array.isArray(o.set)?o.set:{},ids=EQ.map(e=>e[0]);o.set={...f.set,...t};o.set.units=o.set.units==="kg"?"kg":"lb";o.set.rt=/^([01]\d|2[0-3]):[0-5]\d$/.test(o.set.rt)?o.set.rt:"07:00";o.set.rd=["MO","TU","WE","TH","FR","SA","SU"].filter(x=>String(o.set.rd||"").split(",").includes(x)).join(",")||"MO,TU,WE,TH,FR,SA,SU";o.set.time=TIMES.includes(+o.set.time)?+o.set.time:30;o.set.equip=Array.isArray(o.set.equip)?o.set.equip.filter(q=>ids.includes(q)):[];if(!(o.bw>=20&&o.bw<=400))delete o.bw;
- if(o.owner!=null&&typeof o.owner!=="string")o.owner=null;if(typeof o.health==="string")o.health=o.health.slice(0,40);else delete o.health;{const g=o.pg;if(g&&typeof g==="object"&&!Array.isArray(g)&&PROGS.some(q=>q.id===g.id)&&DKEY.test(String(g.start)))o.pg={id:g.id,start:g.start};else delete o.pg}{const c=o.consent;if(c&&typeof c==="object"&&!Array.isArray(c)&&typeof c.terms==="string")o.consent={terms:c.terms.slice(0,40),ver:String(c.ver||"").slice(0,20),updates:c.updates===true};else delete o.consent}return o}catch(e){return null}}
+ if(o.owner!=null&&typeof o.owner!=="string")o.owner=null;if(typeof o.health==="string")o.health=o.health.slice(0,40);else delete o.health;{const g=o.pg;if(g&&typeof g==="object"&&!Array.isArray(g)&&PROGS.some(q=>q.id===g.id)&&DKEY.test(String(g.start)))o.pg={id:g.id,start:g.start};else delete o.pg}{const st=o.start;if(st&&typeof st==="object"&&!Array.isArray(st)){const r={};for(const id of LIDS)if(Number.isFinite(st[id]))r[id]=Math.max(0,Math.min(.9,st[id]));o.start=r}else delete o.start}
+ {if(!(typeof o.rv==="string"&&DKEY.test(o.rv)))delete o.rv;if(!(typeof o.ft==="string"&&DKEY.test(o.ft)))delete o.ft;const lv=o.lv;if(lv&&typeof lv==="object"&&!Array.isArray(lv)){const r={};for(const id of LIDS)if(typeof lv[id]==="string"&&DKEY.test(lv[id]))r[id]=lv[id];o.lv=r}else delete o.lv}
+ {const c=o.consent;if(c&&typeof c==="object"&&!Array.isArray(c)&&typeof c.terms==="string")o.consent={terms:c.terms.slice(0,40),ver:String(c.ver||"").slice(0,20),updates:c.updates===true};else delete o.consent}return o}catch(e){return null}}
 function trimS(){let js=JSON.stringify(S);if(js.length<=900000)return;const ks=Object.keys(S.days).sort();while(ks.length>30&&js.length>900000){delete S.days[ks.shift()];js=JSON.stringify(S)}}
 function load(){try{const s=clean(JSON.parse(localStorage.getItem(KEY)));return s?{...fresh(),...s}:fresh()}catch(e){return fresh()}}
 /* ---- Supabase settings: paste yours here (see SETUP steps). The anon key is safe to be public. ---- */
@@ -504,7 +514,7 @@ function pool(p,c,used,lim){let l=EX.filter(e=>!e.lad&&e.pat===p&&!used.has(e.na
 function mainStep(l,c,low,cap){
  const av=availOf(l,c);if(!av.length)return null;
  const cur=S.lad[l.id],ci=cur?l.steps.findIndex(e=>e.name===cur):-1;let k=0;
- if(ci<0){k=Math.floor(({beg:0,int:.34,adv:.67}[c.level||S.set.level||"beg"]||0)*(av.length-1))}
+ if(ci<0){k=Math.floor((S.start&&S.start[l.id]!=null?S.start[l.id]:({beg:0,int:.34,adv:.67}[c.level||S.set.level||"beg"]||0))*(av.length-1))}
  else{k=-1;av.forEach((e,i)=>{if(l.steps.indexOf(e)<=ci)k=i});if(k<0)k=0}
  if(low)k=Math.max(0,k-1);
  if(cap!=null)while(k>0&&av[k].sc>cap)k--;
@@ -565,7 +575,7 @@ function formV(){if(!F)initF();
  else b=hd("Time and equipment","Pick what you have. Bodyweight moves are always included.")+`<h3>Time</h3><div class="chips">${TIMES.map(t=>chip("time",t,t+" min",F.time===t)).join("")}</div>
  <h3>Equipment</h3><div class="chips">${chip("equip","none","Bodyweight only (at home)",F.equip.length===0)}${EQ.map(([v,l])=>chip("equip",v,l,F.equip.includes(v))).join("")}</div>${F.equip.length===0?`<p class="muted">Only moves that need no equipment, all doable at home.</p>`:""}
  <h3>Weight units</h3><div class="chips">${[["lb","Pounds (lb)"],["kg","Kilograms (kg)"]].map(([v,l])=>chip("units",v,l,F.units===v)).join("")}</div>
- ${Object.keys(S.lad).length?"":`<h3>Your training level</h3><p class="muted">Sets your starting point on each movement. After that, the app moves you up on its own.</p><div class="chips">${[["beg","Beginner"],["int","Intermediate"],["adv","Advanced"]].map(([v,l])=>chip("level",v,l,F.level===v)).join("")}</div>`}
+ ${Object.keys(S.lad).length?"":`<h3>Your training level</h3><p class="muted">Sets your starting point on each movement. After that, the app moves you up on its own.</p><div class="chips">${[["beg","Beginner"],["int","Intermediate"],["adv","Advanced"]].map(([v,l])=>chip("level",v,l,F.level===v)).join("")}</div><p class="muted">Not sure? <button class="lnk" data-a="ft">Take the 2-minute fitness test</button> and the app sets your starting point on each movement.</p>`}
  <label style="display:flex;gap:10px;align-items:flex-start;margin-top:8px"><input type="checkbox" data-a="red" ${F.red?"checked":""}><span>I have sharp or worsening pain, numbness, chest pain or dizziness.</span></label>`+nav(true,true);
  return`<section class="card">${b}</section>`}
 function rowsHTML(wk,wi){const bn=wi!=="",u=isKg()?"kg":"lb",nmn=wk.plan.map(p=>{const e=ex(p.n);return!!e&&e.pat!=="mob"}),fi=nmn.indexOf(true),la=nmn.lastIndexOf(true),sec=i=>fi<0?"":(i===0&&fi>0?'<p class="sec">Warm-up</p>':i===fi&&fi>0?'<p class="sec">Main work</p>':i===la+1&&la+1<nmn.length?'<p class="sec">Cool-down</p>':"");return wk.plan.map((p,i)=>{const e=ex(p.n),l=wk.log[p.n]||{},t=tgt(p.n,p),rx=e.unit==="m"?`${t} slow reps`:e.unit==="x"?`about ${e.lo}–${e.hi} min at a steady pace`:e.unit==="rd"?`${t} rounds`:`${p.sets} × ${t} ${UL[e.unit]}`,L=p.l&&LADS.find(x=>x.id===p.l),lv=p.fin?`<small class="lv">Conditioning finisher</small>`:L?`<small class="lv">Step ${L.steps.indexOf(e)+1} of ${L.steps.length} · ${tierOf(L,e)}${p.m||bn?"":" · lighter option"}</small>`:"",w=`data-w="${wi}"`;
@@ -729,10 +739,41 @@ function progV(){
  const lv=LADS.filter(l=>l.ladder).map(l=>{const i=S.lad[l.id]?l.steps.findIndex(e=>e.name===S.lad[l.id]):-1;if(i<0)return"";const n=l.steps.length;return`<div class="row"><span>${l.title}<br><small class="muted">${l.steps[i].name} · ${tierOf(l,l.steps[i])}</small></span><b>${i+1}/${n}</b></div><div class="bar"><i style="width:${Math.round((i+1)/n*100)}%"></i></div>`}).join("")||`<p class="muted">Your levels show up after your first finished workout.</p>`;
  return quoteCard(today()+"p"+fin.length)+`<section class="card"><div class="stats"><div class="stat"><b>${streak()}</b><span>Day streak</span></div><div class="stat"><b>${wk}</b><span>This week</span></div><div class="stat"><b>${fin.length}</b><span>Total</span></div><div class="stat"><b>${avg}</b><span>Avg ready</span></div></div></section>
  <section class="card"><h3>Points</h3><div class="stats" style="grid-template-columns:repeat(3,1fr)"><div class="stat"><b>${pts.p}</b><span>Points</span></div><div class="stat"><b>${pts.bw}</b><span>Bonus workouts</span></div><div class="stat"><b>${pts.mw+pts.bw}</b><span>All workouts</span></div></div><p class="muted">${PTS_MAIN} points for each daily mission, ${PTS_BONUS} bonus points for each bonus workout.</p></section><section class="card"><h3>How you’ve felt</h3>${feel}</section><section class="card"><h3>Readiness trend</h3>${spark(sc)}</section><section class="card"><h3>Last 28 days</h3><div class="heat">${heat}</div><p class="muted">Green = finished, tinted = checked in.</p></section>
- ${weeksCard()}${progCard()}${badgesCard()}<section class="card"><h3>Your levels</h3>${lv}</section>${wcard}<section class="card"><h3>Your 3RM</h3><details><summary>What is a 3RM?</summary><p class="muted">The heaviest weight you can lift 3 times with good form. Not sure? Leave it blank. We suggest a safe starting weight and learn from what you log.</p></details>${pr}</section>${remCard()}<section class="card"><h3>Recent workouts</h3><p class="muted">Tap a day to see what you did.</p>${hist}</section><section class="card"><h3>Your data</h3><p class="muted">Your progress belongs to you. Download it anytime, or open a report you can save as a PDF.</p><div class="chips"><button class="btn" data-a="rep">Progress report</button><button class="chip" data-a="expc">Download workouts (CSV)</button><button class="chip" data-a="expj">Download all data (JSON)</button></div></section>
+ ${weeksCard()}${progCard()}${reviewCard()}<section class="card"><h3>Fitness test</h3><p class="muted">${S.ft?`Last taken ${S.ft}. `:""}Five quick moves place you on each ladder. Retaking it restarts the movements you test.</p><button class="btn ghost" data-a="ft">${S.ft?"Retake the fitness test":"Take the fitness test"}</button></section>${badgesCard()}<section class="card"><h3>Your levels</h3>${lv}</section>${wcard}<section class="card"><h3>Your 3RM</h3><details><summary>What is a 3RM?</summary><p class="muted">The heaviest weight you can lift 3 times with good form. Not sure? Leave it blank. We suggest a safe starting weight and learn from what you log.</p></details>${pr}</section>${remCard()}<section class="card"><h3>Recent workouts</h3><p class="muted">Tap a day to see what you did.</p>${hist}</section><section class="card"><h3>Your data</h3><p class="muted">Your progress belongs to you. Download it anytime, or open a report you can save as a PDF.</p><div class="chips"><button class="btn" data-a="rep">Progress report</button><button class="chip" data-a="expc">Download workouts (CSV)</button><button class="chip" data-a="expj">Download all data (JSON)</button></div></section>
  `}
 function render(){const sbt=$("#sub");if(sbt)sbt.textContent=user?"Signed in · "+user.email:"Daily Mission";const wb=$("#who");if(wb){wb.hidden=!(user||!sb||authReady);wb.className=user?"chip":"btn hb";wb.textContent=user?"Sign out":"Sign in";wb.setAttribute("data-a",user?"logout":"gosign");wb.setAttribute("aria-label",user?"Sign out of "+user.email:"Sign in")}
 document.querySelectorAll("nav button").forEach(b=>{const on=b.dataset.v===view;b.classList.toggle("on",on);b.setAttribute("aria-selected",on)});$("#app").innerHTML=(view==="today"?installTip():"")+nudge()+pgBanner()+(view==="signin"?signinV():view==="today"?todayV():progV())+(view==="signin"||(view==="today"&&user)?"":accV())}
+/* ---- two-week review: consistent, logged training moves every trained movement up one level ---- */
+const RV_DAYS=14,RV_MIN=4;
+function rvWin(k,cur){const ks=Object.keys(S.days).filter(x=>{const d=S.days[x];return d&&d.fin&&d.ck&&!d.ck.red&&dbt(x,k)<RV_DAYS&&dbt(x,k)>=0}).sort();if(cur&&!ks.includes(k))ks.push(k);return ks}
+function rvStats(k,cur){const ks=rvWin(k,cur);let done=0,logged=0;const seen={};
+ ks.forEach(x=>{const d=S.days[x];(d.plan||[]).forEach(p=>{const l=(d.log||{})[p.n],e=ex(p.n);if(!l||!l.done||!e||!e.lad)return;done++;if(+l.a>0)logged++;seen[e.lad]=(seen[e.lad]||0)+1})});
+ return{n:ks.length,done,logged,ratio:done?logged/done:0,seen}}
+function rvRun(k,d,rpe,up){const first=Object.keys(S.days).filter(x=>S.days[x].fin).sort()[0]||k;if(!S.rv)S.rv=first;if(dbt(S.rv,k)<RV_DAYS)return;
+ const st=rvStats(k,true);d.log=d.log||{};
+ const ok=st.n>=RV_MIN&&st.ratio>=.5&&rpe<=8;
+ if(!ok){up.push(`2-week check: do at least ${RV_MIN} workouts in 2 weeks and log your reps to unlock level-ups. You have ${st.n} so far.`);return}
+ S.lv=S.lv||{};let moved=0;
+ LADS.filter(l=>l.ladder).forEach(L=>{const cur=S.lad[L.id],e=cur&&ex(cur);if(!e||(st.seen[L.id]||0)<2)return;if(S.lv[L.id]&&dbt(S.lv[L.id],k)<RV_DAYS)return;
+  const nx=stepNear(L,e,d.ck,1);if(!nx)return;S.lad[L.id]=nx.name;S.lv[L.id]=k;if(!S.prog[nx.name])S.prog[nx.name]=isSch(nx)?{si:0}:{t:nx.lo};moved++;up.push(`2-WEEK LEVEL UP: ${e.name} → ${nx.name}`)});
+ S.rv=k;up.push(moved?`2-week review passed: ${st.n} workouts, reps logged. ${moved} movement${moved>1?"s":""} moved up.`:`2-week review passed: ${st.n} workouts, reps logged. Everything is already at your level.`)}
+function reviewCard(){const k=today(),first=Object.keys(S.days).filter(x=>S.days[x].fin).sort()[0];
+ if(!first)return`<section class="card"><h3>2-week level check</h3><p class="muted">Finish a workout and log your reps. Every 2 weeks of steady training, each movement you train moves up a level.</p></section>`;
+ const rv=S.rv||first,left=Math.max(0,RV_DAYS-dbt(rv,k)),st=rvStats(k,false);
+ return`<section class="card"><h3>2-week level check</h3><p class="muted">Train at least ${RV_MIN} times in 2 weeks and log your reps. Each movement you trained then moves up a level.</p><div class="row"><span>${left?`Next check in ${left} day${left>1?"s":""}`:"Check runs after your next workout"}</span><span>${st.n} workout${st.n===1?"":"s"} · ${Math.round(st.ratio*100)}% reps logged</span></div></section>`}
+/* ---- fitness test: sets where each movement starts ---- */
+let FT=null;
+function ftHTML(){const n=Object.keys(FT).length,rs=Object.keys(S.lad||{}).length>0;
+ return`<div class="ftc"><div class="repbar"><button class="btn ghost" data-a="ftx">Close</button></div><h2>Fitness test</h2><p class="muted">About 2 minutes. Do each move only if it feels safe. Answer from what you can do today, with good form. Skip any you cannot test. ${rs?"Saving restarts each tested movement at your test level.":""}</p>
+ ${FTQ.map(q=>`<section class="card"><h3>${q.t}</h3><p class="muted">${q.q}</p><div class="chips">${q.o.map((o,i)=>`<button class="chip" data-a="ftp" data-k="${q.k}" data-v="${i}" aria-pressed="${FT[q.k]===i}">${o}</button>`).join("")}</div></section>`).join("")}
+ <div class="acts"><button class="btn ghost" data-a="ftx">Cancel</button><button class="btn ${n?"":"off"}" data-a="ftgo">Save my starting levels</button></div></div>`}
+function openFT(){closeFT();FT={};const el=document.createElement("div");el.id="ft";el.className="ftov";el.setAttribute("role","dialog");el.setAttribute("aria-modal","true");el.innerHTML=ftHTML();document.body.appendChild(el);document.body.style.overflow="hidden"}
+function closeFT(){const el=document.getElementById("ft");if(el)el.remove();document.body.style.overflow="";FT=null}
+function ftApply(ans){S.start=S.start||{};S.lv=S.lv||{};let any=false;
+ FTQ.forEach(q=>{const v=ans[q.k];if(v==null)return;any=true;q.ids.forEach(id=>{S.start[id]=FTF[v];delete S.lad[id];delete S.lv[id]})});
+ if(!any)return false;S.ft=today();const d=S.days[today()];
+ if(d&&d.ck&&!d.fin&&!d.ck.red&&!Object.values(d.log||{}).some(l=>l.done)){d.plan=build(today(),d.ck,d.salt||0);d.log={}}
+ save();return true}
 function finish(wi){const k=today(),d=S.days[k],bn=wi!==undefined&&wi!=="",wk=bn?d.bonus[+wi]:d,feel=Math.min(10,Math.max(1,+$("#rpe").value||6)),rpe=11-feel,up=[];
  if(!wk.plan.some(p=>wk.log[p.n]&&wk.log[p.n].done)){$("#msg").textContent="Tick off at least one exercise first.";return}
  const nw=recW(wk,k);if(nw)up.push(`Weights saved for ${nw} exercise${nw>1?"s":""}.`);
@@ -745,13 +786,14 @@ function finish(wi){const k=today(),d=S.days[k],bn=wi!==undefined&&wi!=="",wk=bn
   if(hit&&rpe<=8){
    if(cur<hiV){const nt=Math.min(hiV,cur+st);setP(p.n,nt);up.push(`${p.n}: next target ${txt(e,nt)}`)}
    else if(!entered&&rpe>5){up.push(`${p.n}: top of the range. Log your reps, or rate the workout easier, to unlock the next level.`)}
-   else if(L&&p.m){const nx=stepNear(L,e,d.ck,1);if(nx){S.lad[L.id]=nx.name;if(!S.prog[nx.name])setP(nx.name,isSch(nx)?0:nx.lo);up.push(`LEVEL UP: ${e.name} → ${nx.name}`)}else{up.push(`${e.name}: top of this ladder. Add load or slow the tempo.`)}}
+   else if(L&&p.m){const nx=stepNear(L,e,d.ck,1);if(nx){S.lad[L.id]=nx.name;S.lv=S.lv||{};S.lv[L.id]=k;if(!S.prog[nx.name])setP(nx.name,isSch(nx)?0:nx.lo);up.push(`LEVEL UP: ${e.name} → ${nx.name}`)}else{up.push(`${e.name}: top of this ladder. Add load or slow the tempo.`)}}
    else{up.push(`${e.name}: target maxed. Add load or slow the tempo.`)}
   }else if(entered&&a<t&&rpe>=9){
    if(cur>loV){const nt=Math.max(loV,cur-st);setP(p.n,nt);up.push(`Stepped back: ${p.n} target is now ${txt(e,nt)}`)}
    else if(L&&p.m){const pv=stepNear(L,e,d.ck,-1);if(pv){S.lad[L.id]=pv.name;if(!S.prog[pv.name])setP(pv.name,isSch(pv)?Math.max(0,SCH[pv.l].length-2):Math.max(pv.lo,pv.hi-2*st));up.push(`Stepped back: ${e.name} → ${pv.name}`)}else{up.push(`${e.name}: still tough at the easiest step. ${REG[L.id]||"Lower the effort and focus on clean form."}`)}}
    else{up.push(`${e.name}: still tough at the lowest target. Keep the effort lower and focus on clean form.`)}
   }});
+ if(!low)rvRun(k,d,rpe,up);
  d.fin={rpe,feel,up,at:Date.now()};popQ=pickQuote(k+"m"+Date.now());save();render();showQ(popQ)}
 document.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b||b.tagName==="INPUT")return;const a=b.dataset.a,k=today(),d=S.days[k],i=+b.dataset.i,w=d&&b.dataset.w!==undefined&&b.dataset.w!==""?d.bonus[+b.dataset.w]:d;
  if(a==="vback"&&e.target!==b)return;
@@ -761,6 +803,10 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b
  if(a==="dback"&&e.target!==b)return;
  if(a==="dclose"||a==="dback"){closeDay();return}
  if(a==="day"){openDay(b.dataset.k,b);return}
+ if(a==="ft"){openFT();return}
+ if(a==="ftx"){closeFT();return}
+ if(a==="ftp"){if(FT){const kk=b.dataset.k,v=+b.dataset.v;if(FT[kk]===v)delete FT[kk];else FT[kk]=v;const c=document.querySelector("#ft .ftc");if(c)c.outerHTML=ftHTML()}return}
+ if(a==="ftgo"){if(FT&&Object.keys(FT).length){ftApply(FT);closeFT();render()}return}
  if(a==="timer"){const pl=w.plan[i],ee=ex(pl.n);if(ee)openTimer(pl.n,ee,tgt(pl.n,pl),b);return}
  if(TM&&a.startsWith("tm")){
   if(a==="tmgo")tmGo();
@@ -820,7 +866,7 @@ async function login(){const em=$("#em").value.trim(),m=$("#am");if(!em){m.textC
 async function verify(){const code=($("#otp").value||"").replace(/\s/g,""),m=$("#am");if(!code){m.textContent="Type the code from the email.";return}m.textContent="Checking…";
  for(const type of["email","magiclink","signup"]){const r=await sb.auth.verifyOtp({email:otpEmail,token:code,type});if(!r.error){otpEmail=null;return}}
  m.textContent="That code didn’t work. Check it and try again, or go back and request a new one."}
-function mergeS(a,b){const m={...fresh(),...a,days:{...b.days,...a.days},prog:{...a.prog},lad:{...(b.lad||{}),...(a.lad||{})},wt:mergeWt(a.wt,b.wt)};for(const k in b.days){const x=a.days[k],y=b.days[k];if(x&&y&&((y.fin&&!x.fin)||bonusDone(y).length>bonusDone(x).length))m.days[k]=y}for(const n in(b.prog||{})){if(!m.prog[n]||b.prog[n].t>m.prog[n].t)m.prog[n]=b.prog[n]}for(const id in(b.lad||{})){const L=LADS.find(x=>x.id===id),ai=L?L.steps.findIndex(e=>e.name===(a.lad||{})[id]):-1,bi=L?L.steps.findIndex(e=>e.name===b.lad[id]):-1;if(bi>ai)m.lad[id]=b.lad[id]}if(!(m.bw>0)&&b.bw>0)m.bw=b.bw;if(!m.consent&&b.consent)m.consent=b.consent;if(!m.health&&b.health)m.health=b.health;if(!m.pg&&b.pg)m.pg=b.pg;return m}
+function mergeS(a,b){const m={...fresh(),...a,days:{...b.days,...a.days},prog:{...a.prog},lad:{...(b.lad||{}),...(a.lad||{})},wt:mergeWt(a.wt,b.wt)};for(const k in b.days){const x=a.days[k],y=b.days[k];if(x&&y&&((y.fin&&!x.fin)||bonusDone(y).length>bonusDone(x).length))m.days[k]=y}for(const n in(b.prog||{})){if(!m.prog[n]||b.prog[n].t>m.prog[n].t)m.prog[n]=b.prog[n]}for(const id in(b.lad||{})){const L=LADS.find(x=>x.id===id),ai=L?L.steps.findIndex(e=>e.name===(a.lad||{})[id]):-1,bi=L?L.steps.findIndex(e=>e.name===b.lad[id]):-1;if(bi>ai)m.lad[id]=b.lad[id]}if(!(m.bw>0)&&b.bw>0)m.bw=b.bw;if(!m.consent&&b.consent)m.consent=b.consent;if(!m.health&&b.health)m.health=b.health;if(!m.pg&&b.pg)m.pg=b.pg;if(!m.start&&b.start)m.start=b.start;if(b.rv&&(!m.rv||b.rv>m.rv))m.rv=b.rv;if(b.ft&&(!m.ft||b.ft>m.ft))m.ft=b.ft;if(b.lv){m.lv={...(m.lv||{})};for(const id in b.lv)if(!m.lv[id]||b.lv[id]>m.lv[id])m.lv[id]=b.lv[id]}return m}
 async function pull(quiet){if(!sb||!user)return;const uid=user.id,before=quiet?JSON.stringify(S):null;let ok=false;try{
  const r=await sb.from("progress").select("data").eq("user_id",uid).maybeSingle();if(r.error)throw r.error;if(!user||user.id!==uid)return;
  const cloud=clean(r.data&&r.data.data);

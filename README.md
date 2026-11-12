@@ -48,6 +48,8 @@ Open `index.html` on GitHub, press the pencil icon, and search for `EXERCISE LIB
 - After each workout the person rates how good they feel (1 rough, 10 great). Hit the target and feel 3/10 or better and that exercise moves up one scheme step.
 - At the top of its scheme, with reps logged, the person moves up one step on the ladder and starts that exercise at the first scheme step.
 - Feeling 1-2/10 while missing the target steps the exercise back one scheme step, then down the ladder.
+- **2-week level check:** every 14 days, if the person finished at least 4 workouts and logged reps on at least half of their strength moves (and rated them 3/10 or better), every movement they trained at least twice moves up one ladder step. A movement that already levelled up in the last 14 days is skipped. Change `RV_DAYS` and `RV_MIN` in `index.html`.
+- **Fitness test:** five quick questions (push-ups, pull-ups, squats, single-leg glute bridges, plank) set where each ladder starts (`FTF=` in `index.html`). It is offered to new users and can be retaken from the Progress tab.
 - Low-readiness days run one step easier and hold targets. After 10+ days away, targets drop slightly.
 - Moves the person has no equipment for, or that load a painful joint, are skipped automatically.
 
