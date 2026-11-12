@@ -486,8 +486,12 @@ function awayAdj(k){const lf=lastFin(k);if(!lf||S.gap===k)return;const gap=Math.
 const focusFor=(k,c)=>{const up=c.pain.some(x=>["neck","shoulder","wrist"].includes(x)),lo=c.pain.some(x=>["hip","knee","ankle"].includes(x));return up&&!lo?"lower":lo&&!up?"upper":focusOf(k)};
 function tgt(n,p){const e=ex(n);if(p&&p.t!=null)return p.t;return(S.prog[n]&&S.prog[n].t)||(e?e.lo:8)}
 const lvStart=l=>({beg:0,int:3,adv:5}[l]||0);
-function gNow(c){const g=S.g;if(g&&Number.isFinite(g.st))return{st:Math.max(0,Math.min(8,g.st|0)),si:Math.max(0,g.si|0),ok:g.ok|0,bad:g.bad|0};const bs=Object.values(S.lad||{}).map(n=>ex(n)).filter(Boolean).map(e=>e.band).sort((a,b)=>a-b);
- if(bs.length){const t=bs[Math.floor(bs.length/2)]*3;return{st:[...VIAB].reverse().find(x=>x<=t)||0,si:0,ok:0,bad:0}}
+function legacyG(){let bs=Object.values(S.lad||{}).map(n=>ex(n)).filter(Boolean).map(e=>e.band);let n=0;
+ const ks=Object.keys(S.days||{}).filter(k=>S.days[k]&&S.days[k].fin);n=ks.length;
+ if(!bs.length)ks.slice(-14).forEach(k=>(S.days[k].plan||[]).forEach(p=>{const e=ex(p.n),l=S.days[k].log&&S.days[k].log[p.n];if(e&&e.lad&&l&&l.done)bs.push(e.band)}));
+ if(!bs.length)return null;bs.sort((x,y)=>x-y);const t=bs[Math.floor(bs.length/2)]*3;return{st:[...VIAB].reverse().find(x=>x<=t)||0,si:Math.min(2,Math.floor(n/6)),ok:0,bad:0}}
+function gNow(c){if(!S.gm){S.gm=1;const L=legacyG();if(L&&(!S.g||S.g.st<L.st||(S.g.st===L.st&&S.g.si<L.si)))S.g=L}
+ const g=S.g;if(g&&Number.isFinite(g.st))return{st:Math.max(0,Math.min(8,g.st|0)),si:Math.max(0,g.si|0),ok:g.ok|0,bad:g.bad|0};
  return{st:lvStart((c&&c.level)||S.set.level),si:0,ok:0,bad:0}}
 /* ===== Intensity pairing rules ===== */
 const BANDS=[3,5,7,10],AVGCAP=[3,3,5,6],sOf=n=>{const e=ex(n);return e?e.sc:5};
@@ -503,7 +507,7 @@ function rulesCtx(k,c){const tier=meta(c).tier,fins=Object.keys(S.days).filter(x
 function pool(p,c,used,lim){let l=EX.filter(e=>!e.lad&&e.pat===p&&!used.has(e.name)&&eqOK(e,c)&&painOK(e,c));
  if(lim){l=l.filter(e=>e.sc<=lim.cap&&(!lim.noImp||!e.imp)&&(!lim.prevImp||!e.imp)&&(lim.min==null||e.sc>=lim.min)&&(lim.st==null||e.stage<=lim.st)&&(!lim.fit||lim.fit(e))&&(lim.ez||!EZ(e)))}
  return l.sort((a,b)=>lastDone(a.name).localeCompare(lastDone(b.name)))}
-const EZ=e=>e.band===0&&e.l==="A",ezOK=(c,tier)=>(c.level||S.set.level)==="beg"||(c.pain&&c.pain.length>0)||tier==="low";
+const EZ=e=>e.band===0&&e.l==="A",ezOK=(c,tier,G)=>G.st<3||(c.pain&&c.pain.length>0)||tier==="low";
 const LP=["push","pull","vpull","hinge","squat"],BCEIL=[[2,4],[5,6],[7,10]],BMAX=[4,6,10],BMIN=[1,4,5];
 /* strength moves: same letter as the day's stage, in the stage's band, with a score window that rises as the scheme climbs */
 function liftPick(p,c,used,lim,G,r){
@@ -514,7 +518,7 @@ function liftPick(p,c,used,lim,G,r){
   l.sort((a,b)=>(dir<0?b.stage-a.stage:dir>0?a.stage-b.stage:0)||lastDone(a.name).localeCompare(lastDone(b.name)));return l[Math.floor(r()*Math.min(3,l.length))]}
  return lim.ez?null:liftPick(p,c,used,{...lim,ez:true},G,r)}
 function build(k,c,salt,o){o=o||{};
- const r=rng(k+"|"+salt),{tier}=meta(c),f=o.focus||focusFor(k,c),low=tier==="low",TM=o.time||c.time,R=rulesCtx(k,c),G=gNow(c),EZA=ezOK(c,tier),GL="ABC"[G.st%3],GB=Math.floor(G.st/3);
+ const r=rng(k+"|"+salt),{tier}=meta(c),f=o.focus||focusFor(k,c),low=tier==="low",TM=o.time||c.time,R=rulesCtx(k,c),G=gNow(c),EZA=ezOK(c,tier,G),GL="ABC"[G.st%3],GB=Math.floor(G.st/3);
  const bodies={lower:["squat","hinge","core","squat","hinge"],upper:["push","pull","vpull","core","push","pull"],full:["squat","push","hinge","pull","vpull","core"],cond:["cond","cond","cond","core","cond","cond"]},mseq=["mob","core","mob","core","mob","core","mob","mob"];
  const seq=f==="mob"?mseq:low?["core","hinge","pull","core"]:bodies[f],lift=f!=="mob",WUN={lower:["90/90 Breathing","Half-Kneeling Hip Flexor Stretch","90/90 Hip Switch","Hip CARs","Wall Ankle Rocking","Deep Squat Hold","World’s Greatest Stretch","Supine Figure-4 Stretch","Wall Calf Stretch","Cat-Cow Flow","Quadruped Fire Hydrant","Alternating Pigeon Stretch"],upper:["90/90 Breathing","Cat-Cow Flow","Thoracic Extension Over Bench","Quadruped T-Spine Rotation","Open Book Rotation","Thread the Needle","Wall Slide","Scapular CARs","Doorway Pec Stretch","Chin Tuck Reset","Over Under Stretch","T-Spine Wall Rotations"],full:["90/90 Breathing","Cat-Cow Flow","Hip CARs","Scapular CARs","Quadruped T-Spine Rotation","World’s Greatest Stretch","Wall Slide","Deep Squat Hold","90/90 Hip Switch","Inchworms"],cond:["90/90 Breathing","Cat-Cow Flow","Hip CARs","Wall Ankle Rocking","World’s Greatest Stretch","Scapular CARs","Inchworms"]};
  const PW=progWeek(k),pw=PW&&PW.W;if(pw&&!o.bonus){R.cap=Math.max(3,R.cap+(pw.cap||0));R.avg=Math.max(3,R.avg+(pw.cap||0))}
