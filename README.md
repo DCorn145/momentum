@@ -10,7 +10,7 @@ A free, single-file daily workout app. Each day you do a 30-second check-in (sle
 - **Time-based planning**: the plan is built to fit your available minutes.
 - **Explainable**: each mission shows why it looks the way it does.
 - **Progress tracking**: streak, weekly count, readiness trend, 28-day grid, recent workouts, and automatic target progression.
-- **Private**: no ads, no tracking. Works without an account (data stays in your browser's localStorage). If you sign in with your email, progress is also synced to your account in Supabase. Copy/paste backup on the Progress tab, and a Delete my account button. See `privacy.html` and `terms.html`.
+- **Private**: no ads, no tracking. Works without an account (data stays in your browser's localStorage). If you sign in with your email, progress is also synced to your account in Supabase. Your Progress tab has a Delete my account button for signed-in users. See `privacy.html` and `terms.html`.
 
 ## Run it
 
@@ -28,13 +28,14 @@ No build step. Open `index.html` in a browser.
 ### Add or reorder exercises
 Open `index.html` on GitHub, press the pencil icon, and search for `EXERCISE LIBRARY`. Each exercise is one line:
 
-    Name | equipment | joints it loads | unit | coaching cue | rep range (optional) | load (optional)
+    Name | equipment | joints it loads | unit | coaching cue | rep range (optional) | load (optional) | intensity 1-10 | letter A/B/C
 
-- **Ladders** list exercises from easiest (top) to hardest (bottom). Put a new line where it belongs.
-- Equipment codes: `bw db band kb bench bb hex bar`. A comma means either one (`db,kb`), a plus means both (`db+bench`).
+- **Intensity** is the 1-10 score. Add `i` after it (like `7i`) for jumping or landing moves.
+- **Letter** picks the set and rep scheme for strength moves (see `SCH=` in `index.html`). A: 1x20, 2x10, 2x12, 3x10, 3x15. B: 2x8, 3x6, 3x8, 4x5, 4x6. C: 2x3, 3x3, 5x4, 5x5. Core, mobility and cardio can leave the letter blank.
+- Equipment codes: `bw db band kb bench bb hex bar cable med`. A comma means either one (`db,kb`), a plus means both (`db+bench`).
 - Joints: `neck shoulder back hip knee ankle wrist`. People with pain there are not given the move.
-- Units: `r` reps, `rs` reps each side, `s` seconds, `ss` seconds each side, `m` slow mobility reps.
-- `load` / `noload` forces a weight box on or off. If left off, moves needing `db`, `kb`, `bb` or `hex` get one automatically.
+- Units: `r` reps, `rs` reps each side, `s` seconds, `ss` seconds each side, `m` slow mobility reps, `rd` rounds, `x` one steady effort (the range is minutes).
+- `load` / `noload` forces a weight box on or off. If left off, moves needing `db`, `kb`, `bb`, `hex` or `cable` get one automatically.
 - A line starting with `#` starts a new group: `# id | pattern | Title | ladder`.
 
 ### Weight tracking
@@ -42,11 +43,14 @@ Open `index.html` on GitHub, press the pencil icon, and search for `EXERCISE LIB
 - To change the percentages, search for `PCT=` in `index.html`.
 
 ### How progression works
-- Each ladder remembers the person's current step. New users pick Beginner, Intermediate or Advanced once.
-- After each workout the person rates how good they feel (1 rough, 10 great). Hit the target and feel 3/10 or better and the target rises by 1 rep (5 sec for holds) until the top of the range.
-- At the top of the range, with reps logged, the person moves up one step and the target resets.
-- Feeling 1-2/10 while missing the target lowers the target, then steps back down the ladder.
-- Low-readiness days run one step easier and hold targets. After 10+ days away, targets drop slightly.
+- Every person has one overall **stage**. The nine stages run 1-4 A, 1-4 B, 1-4 C, 5-6 A, 5-6 B, 5-6 C, 7-10 A, 7-10 B, 7-10 C (the number is the exercise intensity score, the letter is the set and rep scheme). A stage is skipped automatically if fewer than three movement groups have an exercise in it.
+- New users pick Beginner (starts at 1-4 A), Intermediate (5-6 A) or Advanced (5-6 C) once. Change these in `lvStart=`.
+- A workout uses strength moves from the current stage's letter and score band, so A moves are paired with A, B with B, C with C. When the list has no move for a group at the current stage, the app falls back to the nearest same-letter move.
+- Beginners get extra mobility: four warm-up moves and two cool-down moves on lifting days.
+- After each workout the person rates how good they feel (1 rough, 10 great). Hit the targets and feel 3/10 or better and it counts as a good session. Three good sessions (`NEED=`) move the scheme up one step (for example 1x20 to 2x10). At the end of the scheme the person moves up to the next stage.
+- Two hard sessions in a row (feeling 1-2/10 while missing targets) step back one notch.
+- Core, mobility and cardio use their own rep or second targets that rise by 1 rep (5 sec for holds) each good session.
+- Low-readiness days run one notch easier and hold progress. After 10+ days away, targets drop slightly.
 - Moves the person has no equipment for, or that load a painful joint, are skipped automatically.
 
 ## Disclaimer
