@@ -337,7 +337,7 @@ Forearm Plank | bw | shoulder | s | Elbows under the shoulders, body in one line
 Forearm Side Plank | bw | shoulder | ss | Stack the hips in one long line. |  |  | 4 | 
 Bear Hold | bw | wrist,knee,shoulder | s | Knees hover an inch off the floor, back flat. | 15-30 |  | 4 | 
 Superman Hold | bw | back | s | Lift the arms and legs a little, neck long. | 15-30 |  | 3 | 
-High to Low Plank | bw |  | rs | Arms Shoulder Width, Belly Button to Spiine, Control Low Back Rotation and Sag. | 8-12 |  | 3 | 
+Heel-Tap Dead Bug | bw |  | rs | Low back on the floor, tap one heel at a time. | 8-12 |  | 3 | 
 Plank Shoulder Taps | bw | wrist,shoulder | rs | Wide feet, tap the shoulder, hips stay level. | 6-10 |  | 5 | 
 Hollow Hold | bw |  | s | Low back pressed down, arms and legs long and low. | 15-30 |  | 5 | 
 Side Plank Hip Dip | bw | shoulder | rs | In a side plank, lower the hip a little and lift. | 6-10 |  | 5 | 
@@ -486,7 +486,9 @@ function awayAdj(k){const lf=lastFin(k);if(!lf||S.gap===k)return;const gap=Math.
 const focusFor=(k,c)=>{const up=c.pain.some(x=>["neck","shoulder","wrist"].includes(x)),lo=c.pain.some(x=>["hip","knee","ankle"].includes(x));return up&&!lo?"lower":lo&&!up?"upper":focusOf(k)};
 function tgt(n,p){const e=ex(n);if(p&&p.t!=null)return p.t;return(S.prog[n]&&S.prog[n].t)||(e?e.lo:8)}
 const lvStart=l=>({beg:0,int:3,adv:5}[l]||0);
-function gNow(c){const g=S.g;if(g&&Number.isFinite(g.st))return{st:Math.max(0,Math.min(8,g.st|0)),si:Math.max(0,g.si|0),ok:g.ok|0,bad:g.bad|0};return{st:lvStart((c&&c.level)||S.set.level),si:0,ok:0,bad:0}}
+function gNow(c){const g=S.g;if(g&&Number.isFinite(g.st))return{st:Math.max(0,Math.min(8,g.st|0)),si:Math.max(0,g.si|0),ok:g.ok|0,bad:g.bad|0};const bs=Object.values(S.lad||{}).map(n=>ex(n)).filter(Boolean).map(e=>e.band).sort((a,b)=>a-b);
+ if(bs.length){const t=bs[Math.floor(bs.length/2)]*3;return{st:[...VIAB].reverse().find(x=>x<=t)||0,si:0,ok:0,bad:0}}
+ return{st:lvStart((c&&c.level)||S.set.level),si:0,ok:0,bad:0}}
 /* ===== Intensity pairing rules ===== */
 const BANDS=[3,5,7,10],AVGCAP=[3,3,5,6],sOf=n=>{const e=ex(n);return e?e.sc:5};
 function dayAvg(d){const lg=d.log||{},any=Object.keys(lg).length,a=(d.plan||[]).filter(p=>{const e=ex(p.n);return e&&e.pat!=="mob"&&(!any||(lg[p.n]&&lg[p.n].done))}).map(p=>e_sc(p.n));return a.length?a.reduce((x,y)=>x+y,0)/a.length:0}
