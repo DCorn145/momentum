@@ -43,14 +43,12 @@ Open `index.html` on GitHub, press the pencil icon, and search for `EXERCISE LIB
 - To change the percentages, search for `PCT=` in `index.html`.
 
 ### How progression works
-- Every person has one overall **stage**. The nine stages run 1-4 A, 1-4 B, 1-4 C, 5-6 A, 5-6 B, 5-6 C, 7-10 A, 7-10 B, 7-10 C (the number is the exercise intensity score, the letter is the set and rep scheme). A stage is skipped automatically if fewer than three movement groups have an exercise in it.
-- New users pick Beginner (starts at 1-4 A), Intermediate (5-6 A) or Advanced (5-6 C) once. Change these in `lvStart=`.
-- A workout uses strength moves from the current stage's letter and score band, so A moves are paired with A, B with B, C with C. When the list has no move for a group at the current stage, the app falls back to the nearest same-letter move.
-- Beginners get extra mobility: four warm-up moves and two cool-down moves on lifting days.
-- After each workout the person rates how good they feel (1 rough, 10 great). Hit the targets and feel 3/10 or better and it counts as a good session. Three good sessions (`NEED=`) move the scheme up one step (for example 1x20 to 2x10). At the end of the scheme the person moves up to the next stage.
-- Two hard sessions in a row (feeling 1-2/10 while missing targets) step back one notch.
-- Core, mobility and cardio use their own rep or second targets that rise by 1 rep (5 sec for holds) each good session.
-- Low-readiness days run one notch easier and hold progress. After 10+ days away, targets drop slightly.
+- Each movement group (push, pull, vertical pull, hip, squat, core) is a ladder from easiest to hardest by intensity score. Each ladder remembers the person's current step. New users pick Beginner, Intermediate or Advanced once to set their starting step.
+- The letter on an exercise sets its sets and reps, and only those. A: 1x20, 2x10, 2x12, 3x10, 3x15. B: 2x8, 3x6, 3x8, 4x5, 4x6. C: 2x3, 3x3, 5x4, 5x5. An A exercise is only ever prescribed in the A scheme, and so on. Change them in `SCH=` in `index.html`. Timed holds, core, mobility and cardio use their own rep or second ranges.
+- After each workout the person rates how good they feel (1 rough, 10 great). Hit the target and feel 3/10 or better and that exercise moves up one scheme step.
+- At the top of its scheme, with reps logged, the person moves up one step on the ladder and starts that exercise at the first scheme step.
+- Feeling 1-2/10 while missing the target steps the exercise back one scheme step, then down the ladder.
+- Low-readiness days run one step easier and hold targets. After 10+ days away, targets drop slightly.
 - Moves the person has no equipment for, or that load a painful joint, are skipped automatically.
 
 ## Disclaimer
