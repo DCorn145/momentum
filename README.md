@@ -60,3 +60,13 @@ M☺︎BENTUM provides educational fitness guidance only. It is not medical advi
 ## License
 
 All rights reserved, see `LICENSE`.
+
+## Health / watch readiness layer
+A native shell can provide `window.MobHealth.read()`; step 1 of the daily check-in then shows "Fill from my watch" (sleep, energy, stress from sleep + HRV + resting HR vs your own baseline). See `docs/health-readiness.md`.
+
+## Workout layout
+- Every lifting day: mobility warm-up, then 3 easy conditioning moves (1 set each) to raise the heart rate, then the main work, then a cool-down.
+- Main moves are grouped into circuits of 2-3. Everyone in a circuit does the same number of rounds, never more sets than that move's A/B/C scheme allows.
+- A bonus workout never repeats a move from the day's workout or from other bonus workouts that day.
+- If a logged set is 60% or less of the target (for example 10 of 20), the next target steps back even when the workout felt okay.
+- Nothing repeats in a day: the mission, bonus workouts and swaps never reuse a move already in another workout that day, and bonus picks avoid next-door steps of the same ladder.
