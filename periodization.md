@@ -26,3 +26,21 @@ A repeating cycle of weeks, counted from the user's first check-in (`S.pstart`):
 Fields per week: `t` name, `note` text, `off` scheme steps above (+) or below (-) the level, `cap` readiness cap shift, `hold` true = no level changes, `L` optional letter overrides by slot, e.g. `{cBsquat:"B"}` (slot ids: cA/cB + ladder id: hip, pull, push, squat, vpull, core).
 
 Add or reorder rows to change the cycle length (it can be 6, 8 or 12 weeks). Starting a Program from the Progress page replaces the default cycle with that program's weeks (its `sets` value acts as `off`, a week named "Deload" holds levels, and its `wu` list themes the mobility block).
+
+## Weekly rhythm (heavy / moderate / light)
+Inside each cycle week, the Nth finished mission of that week sets the day's load. Weeks are counted from the cycle start date.
+
+| Mission of the week | Day type | Effect |
+|---|---|---|
+| 1st to 3rd | Heavy | Targets at the week's level. Progress is earned here |
+| 4th to 5th | Moderate | One scheme step lighter. Targets and levels held |
+| 6th and later | Light | Two steps lighter. Targets and levels held |
+
+A 7-day user gets H H H M M L L every week. A 3 to 4 day user is almost always Heavy. Deload weeks skip the rhythm (the whole week is light and held).
+
+## Pacing rules
+- A strength move steps up only after the target is hit on two Heavy days (rep or time target reached, effort 8 or easier, reps logged if entered), and at most once every 6 days per ladder.
+- A ladder levels up (next exercise) only at the top step, after the same two hits, and no more than once every 7 days. The 2-week level check and the fitness test are the faster routes.
+- Moves rotate: the three most recent days' moves are avoided when a near alternative exists, and a move maxed out at the top step is skipped in favour of a harder neighbour.
+- A move rotated in next to ones you've trained starts at your current step, not step 1.
+- A gap of 14 or more days between finished missions restarts the cycle at Foundation.

@@ -73,3 +73,4 @@ A native shell can provide `window.MobHealth.read()`; step 1 of the daily check-
 
 ## Daily structure and periodization
 Every mission is Mobility (3), Primer (2), Circuit A (3), Circuit B (3), Cool-down (2). A 4-week cycle (Foundation, Build, Push, Deload) runs automatically. See `docs/periodization.md`.
+- Weekly rhythm: Heavy, Moderate and Light days inside each week. Pacing rules and move rotation are in `docs/periodization.md`.
